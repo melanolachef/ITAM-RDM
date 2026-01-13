@@ -1,21 +1,25 @@
 package com.reidosmotores.itam.controller;
 
-import com.reidosmotores.itam.model.Asset;
-import com.reidosmotores.itam.model.AssetHistory;
-import com.reidosmotores.itam.repository.AssetRepository;
-import com.reidosmotores.itam.repository.AssetHistoryRepository;
-import com.reidosmotores.itam.repository.EmployeeRepository;
-import com.reidosmotores.itam.service.QRCodeService;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import com.reidosmotores.itam.model.Asset;
+import com.reidosmotores.itam.model.AssetHistory;
+import com.reidosmotores.itam.repository.AssetHistoryRepository;
+import com.reidosmotores.itam.repository.AssetRepository;
+import com.reidosmotores.itam.repository.EmployeeRepository;
+import com.reidosmotores.itam.service.QRCodeService;
 
 @Controller
 @RequestMapping("/ativos")
@@ -30,10 +34,21 @@ public class AssetController {
     
     // Método para carregar os números do Dashboard (usado na listagem e na edição)
     private void carregarDashboard(Model model) {
+        // 1. Totais Gerais (Cards)
         model.addAttribute("qtdTotal", repository.count());
-        // Lembre-se: Para isso funcionar, o método countByStatus deve existir no Repository
         model.addAttribute("qtdDisponivel", repository.countByStatus("DISPONIVEL"));
         model.addAttribute("qtdManutencao", repository.countByStatus("MANUTENCAO"));
+
+        // 2. Dados para o Gráfico de STATUS (Donut)
+        model.addAttribute("qtdEmUso", repository.countByStatus("EM_USO"));
+        model.addAttribute("qtdDescarte", repository.countByStatus("DESCARTE"));
+
+        // 3. Dados para o Gráfico de TIPOS (Barras)
+        model.addAttribute("qtdNotebook", repository.countByTipo("Notebook"));
+        model.addAttribute("qtdDesktop", repository.countByTipo("Desktop"));
+        model.addAttribute("qtdMonitor", repository.countByTipo("Monitor"));
+        model.addAttribute("qtdCelular", repository.countByTipo("Celular"));
+        model.addAttribute("qtdImpressora", repository.countByTipo("Impressora"));
     }
 
     // --- ROTAS PRINCIPAIS ---

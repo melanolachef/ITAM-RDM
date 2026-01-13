@@ -5,18 +5,18 @@
     <title>SCA - Rei dos Motores</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
             --rei-red: #d90429;
             --rei-black: #1a1a1a;
             --rei-hover: #b00320;
         }
-        /* Navbar Personalizada */
         .navbar-rei {
             background-color: var(--rei-black);
             border-bottom: 3px solid var(--rei-red);
         }
-        /* Botões Personalizados */
         .btn-rei {
             background-color: var(--rei-red);
             color: white;
@@ -28,15 +28,12 @@
             color: white;
         }
         .text-rei { color: var(--rei-red); }
-        
-        /* Ajuste do Card de Edição */
         .card-header-rei {
             border-bottom: 2px solid var(--rei-red);
             background-color: white;
             color: var(--rei-black);
             font-weight: bold;
         }
-        /* Paginação e Links */
         .page-link { color: var(--rei-red); }
         .page-link:hover { color: var(--rei-hover); }
     </style>
@@ -55,9 +52,7 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link active fw-bold" href="/ativos">Ativos</a></li>
                     <li class="nav-item"><a class="nav-link" href="/funcionarios">Colaboradores</a></li>
-                    <li class="nav-item">
-    <a class="nav-link" href="/usuarios">Usuários</a>
-</li>
+                    <li class="nav-item"><a class="nav-link" href="/usuarios">Usuários</a></li>
                 </ul>
                 <form th:action="@{/logout}" method="post" class="d-flex">
                     <button class="btn btn-outline-light btn-sm" type="submit">Sair <i class="bi bi-box-arrow-right"></i></button>
@@ -99,6 +94,25 @@
                             <h2 class="fw-bold text-dark" th:text="${qtdManutencao}">0</h2>
                         </div>
                         <i class="bi bi-tools fs-1 opacity-50 text-dark"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white fw-bold">Status do Estoque</div>
+                    <div class="card-body">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white fw-bold">Equipamentos por Tipo</div>
+                    <div class="card-body">
+                        <canvas id="typeChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -233,11 +247,70 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Filtro de Pesquisa
         document.getElementById('searchInput').addEventListener('keyup', function() {
             var value = this.value.toLowerCase();
             document.querySelectorAll('table tbody tr').forEach(function(row) {
                 row.style.display = row.textContent.toLowerCase().indexOf(value) > -1 ? '' : 'none';
             });
         });
+
+        // --- CONFIGURAÇÃO DOS GRÁFICOS ---
+        
+        // 1. Gráfico de Rosca (Status)
+        const ctxStatus = document.getElementById('statusChart');
+        new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+                labels: ['Disponível', 'Em Uso', 'Manutenção', 'Descarte'],
+                datasets: [{
+                    data: [
+                        [[${qtdDisponivel}]], 
+                        [[${qtdEmUso}]], 
+                        [[${qtdManutencao}]], 
+                        [[${qtdDescarte}]]
+                    ],
+                    backgroundColor: ['#198754', '#212529', '#ffc107', '#dc3545'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+
+        // 2. Gráfico de Barras (Tipos)
+        const ctxType = document.getElementById('typeChart');
+        new Chart(ctxType, {
+            type: 'bar',
+            data: {
+                labels: ['Notebook', 'Desktop', 'Monitor', 'Celular', 'Impressora'],
+                datasets: [{
+                    label: 'Quantidade',
+                    data: [
+                        [[${qtdNotebook}]], 
+                        [[${qtdDesktop}]], 
+                        [[${qtdMonitor}]], 
+                        [[${qtdCelular}]],
+                        [[${qtdImpressora}]]
+                    ],
+                    backgroundColor: '#d90429', // Vermelho Rei
+                    borderColor: '#b00320',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
     </script>
 </body>
+</html>
