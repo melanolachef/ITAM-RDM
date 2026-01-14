@@ -1,171 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Acesso Restrito - Rei dos Motores</title>
+    <title>Acesso Restrito | ITAM</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     
-    <style>
-        :root {
-            --rei-black: #1a1a1a;
-            --rei-red: #d90429; /* Vermelho esportivo/automotivo */
-            --rei-red-hover: #b00320;
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rei: {
+                            red: '#d90429',
+                            dark: '#1a1a1a',
+                            hover: '#b00320',
+                            gray: '#2b2b2b'
+                        }
+                    }
+                }
+            }
         }
-
-        body {
-            background-color: #f4f6f8;
-            background-image: linear-gradient(135deg, #f4f6f8 0%, #e9ecef 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        .login-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 15px;
-        }
-
-        .card-login {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            overflow: hidden; /* Para o cabeçalho não sair das bordas */
-            background: white;
-        }
-
-        /* Cabeçalho Preto com detalhe Vermelho */
-        .brand-header {
-            background-color: var(--rei-black);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-            position: relative;
-        }
-
-        /* Linha vermelha decorativa abaixo do preto */
-        .brand-header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background-color: var(--rei-red);
-        }
-
-        .brand-icon {
-            font-size: 3rem;
-            color: var(--rei-red);
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .brand-title {
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-size: 1.2rem;
-            margin: 0;
-        }
-
-        .brand-subtitle {
-            color: #aaa;
-            font-size: 0.85rem;
-            font-weight: 400;
-        }
-
-        /* Estilo dos Inputs (Floating Labels) */
-        .form-floating > .form-control:focus {
-            border-color: var(--rei-red);
-            box-shadow: 0 0 0 0.25rem rgba(217, 4, 41, 0.15);
-        }
-
-        .form-floating > label {
-            color: #6c757d;
-        }
-
-        /* Botão Vermelho Personalizado */
-        .btn-rei {
-            background-color: var(--rei-red);
-            border: none;
-            color: white;
-            padding: 12px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-rei:hover {
-            background-color: var(--rei-red-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(217, 4, 41, 0.3);
-            color: white;
-        }
-
-        .alert-custom {
-            font-size: 0.9rem;
-            border-radius: 8px;
-            border: none;
-        }
-    </style>
+    </script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
-<body>
+<body class="bg-zinc-900 h-screen flex items-center justify-center font-sans antialiased text-slate-200">
 
-    <div class="login-container">
-        <div class="card card-login">
+    <div class="w-full max-w-md p-6">
+        <div class="bg-zinc-800 rounded-2xl shadow-2xl border border-zinc-700 overflow-hidden">
             
-            <div class="brand-header">
-                <i class="bi bi-speedometer2 brand-icon"></i> <h1 class="brand-title">REI DOS MOTORES</h1>
-                <div class="brand-subtitle">Gestão de Ativos de TI</div>
+            <div class="bg-rei-dark p-8 text-center border-b border-rei-red/30 relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-rei-red to-transparent"></div>
+                <i class="bi bi-speedometer2 text-5xl text-rei-red mb-4 block"></i>
+                <h1 class="text-2xl font-bold tracking-wider text-white">REI DOS MOTORES</h1>
+                <p class="text-zinc-400 text-sm mt-1 uppercase tracking-widest">Asset Management</p>
             </div>
 
-            <div class="card-body p-4 p-md-5">
+            <div class="p-8">
                 
-                <div class="text-center mb-4">
-                    <h5 class="fw-bold text-secondary">Bem-vindo</h5>
-                    <p class="text-muted small">Insira suas credenciais corporativas</p>
+                <div th:if="${param.error}" class="bg-red-500/10 border border-red-500/50 text-red-500 text-sm rounded-lg p-3 mb-6 flex items-center">
+                    <i class="bi bi-exclamation-triangle-fill mr-2"></i> Usuário ou senha inválidos.
+                </div>
+                <div th:if="${param.logout}" class="bg-green-500/10 border border-green-500/50 text-green-500 text-sm rounded-lg p-3 mb-6 flex items-center">
+                    <i class="bi bi-check-circle-fill mr-2"></i> Logout realizado.
                 </div>
 
-                <div th:if="${param.error}" class="alert alert-danger alert-custom d-flex align-items-center mb-4" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <div>Usuário ou senha incorretos.</div>
-                </div>
-
-                <div th:if="${param.logout}" class="alert alert-success alert-custom d-flex align-items-center mb-4" role="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i>
-                    <div>Logout realizado com sucesso.</div>
-                </div>
-
-                <form th:action="@{/login}" method="post">
+                <form th:action="@{/login}" method="post" class="space-y-5">
                     
-                    <div class="form-floating mb-3">
-                        <input type="text" name="username" class="form-control" id="floatingInput" placeholder="Usuário" required autofocus>
-                        <label for="floatingInput"><i class="bi bi-person"></i> Usuário</label>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-500 uppercase mb-1 ml-1">Usuário</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-500">
+                                <i class="bi bi-person"></i>
+                            </span>
+                            <input type="text" name="username" required autofocus
+                                class="w-full bg-zinc-900/50 text-white border border-zinc-700 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-rei-red focus:ring-1 focus:ring-rei-red transition-colors placeholder-zinc-600"
+                                placeholder="Seu usuário corporativo">
+                        </div>
                     </div>
 
-                    <div class="form-floating mb-4">
-                        <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Senha" required>
-                        <label for="floatingPassword"><i class="bi bi-lock"></i> Senha</label>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-500 uppercase mb-1 ml-1">Senha</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-500">
+                                <i class="bi bi-lock"></i>
+                            </span>
+                            <input type="password" name="password" required
+                                class="w-full bg-zinc-900/50 text-white border border-zinc-700 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-rei-red focus:ring-1 focus:ring-rei-red transition-colors placeholder-zinc-600"
+                                placeholder="••••••••">
+                        </div>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-rei btn-lg">
-                            ACESSAR SISTEMA
-                        </button>
-                    </div>
+                    <button type="submit" 
+                        class="w-full bg-gradient-to-r from-rei-red to-rei-hover text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-rei-red/20 transform hover:-translate-y-0.5 transition-all duration-200">
+                        ACESSAR SISTEMA
+                    </button>
                 </form>
-
             </div>
-            
-            <div class="card-footer bg-white border-0 text-center py-3">
-                <small class="text-muted" style="font-size: 0.75rem;">
-                    &copy; 2026 Rei dos Motores ITAM. Uso interno restrito.
-                </small>
+
+            <div class="bg-zinc-900/50 p-4 text-center border-t border-zinc-700">
+                <p class="text-xs text-zinc-500">
+                    &copy; 2026 IT Infrastructure Division
+                </p>
             </div>
         </div>
     </div>

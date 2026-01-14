@@ -2,14 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Gestão de Acessos - Rei dos Motores</title>
+    <title>Licenças | ITAM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         :root { --rei-red: #d90429; --rei-black: #1a1a1a; }
         .navbar-rei { background-color: var(--rei-black); border-bottom: 3px solid var(--rei-red); }
         .btn-rei { background-color: var(--rei-red); color: white; border: none; font-weight: 600; }
-        .btn-rei:hover { background-color: #b00320; color: white; }
         .card-header-rei { border-bottom: 2px solid var(--rei-red); background-color: white; color: var(--rei-black); font-weight: bold; }
     </style>
 </head>
@@ -27,9 +26,9 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="/ativos">Ativos</a></li>
                     <li class="nav-item"><a class="nav-link" href="/funcionarios">Colaboradores</a></li>
-                    <li class="nav-item"><a class="nav-link active fw-bold" href="/usuarios">Usuários</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/usuarios">Usuários</a></li>
                     <li class="nav-item"><a class="nav-link" href="/linhas">Telefonia</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/licencas">Softwares</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-bold" href="/licencas">Softwares</a></li>
                     <li class="nav-item"><a class="nav-link" href="/manutencoes">Manutenções</a></li>
                     <li class="nav-item"><a class="nav-link" href="/acessorios">Acessórios</a></li>
                 </ul>
@@ -41,30 +40,33 @@
     </nav>
 
 <div class="container">
-    <h2 class="mb-4 text-secondary"><i class="bi bi-shield-lock-fill text-danger"></i> Controle de Acesso</h2>
-    
     <div class="row">
         <div class="col-md-4">
             <div class="card shadow-sm border-0">
-                <div class="card-header card-header-rei py-3">Novo Usuário</div>
+                <div class="card-header card-header-rei py-3">Nova Licença</div>
                 <div class="card-body">
-                    <form th:action="@{/usuarios/salvar}" th:object="${novoUsuario}" method="post">
+                    <form th:action="@{/licencas/salvar}" th:object="${novaLicenca}" method="post">
+                        <input type="hidden" th:field="*{id}">
                         <div class="mb-3">
-                            <label class="small text-muted fw-bold">Login (Usuário)</label>
-                            <input type="text" th:field="*{username}" class="form-control" placeholder="Ex: amanda.rh" required>
+                            <label class="fw-bold small">Software</label>
+                            <input type="text" th:field="*{nomeSoftware}" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="small text-muted fw-bold">Senha Inicial</label>
-                            <input type="password" th:field="*{password}" class="form-control" placeholder="******" required>
+                            <label class="fw-bold small">Chave/Serial</label>
+                            <input type="text" th:field="*{chaveAtivacao}" class="form-control font-monospace">
                         </div>
                         <div class="mb-3">
-                            <label class="small text-muted fw-bold">Perfil</label>
-                            <select th:field="*{role}" class="form-select">
-                                <option value="ADMIN">Administrador (Total)</option>
-                                <option value="USER">Operador (Restrito)</option>
+                            <label class="fw-bold small">Vencimento</label>
+                            <input type="date" th:field="*{dataExpiracao}" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold small">Usuário</label>
+                            <select th:field="*{colaborador}" class="form-select">
+                                <option value="">-- Geral --</option>
+                                <option th:each="func : ${listaFuncionarios}" th:value="${func.id}" th:text="${func.nome}"></option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-rei w-100">Criar Acesso</button>
+                        <button type="submit" class="btn btn-primary w-100">Salvar</button>
                     </form>
                 </div>
             </div>
@@ -73,28 +75,21 @@
         <div class="col-md-8">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-0">
-                    <table class="table table-striped table-hover mb-0 align-middle">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Login</th>
-                                <th>Perfil</th>
-                                <th class="text-end">Ações</th>
-                            </tr>
-                        </thead>
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-dark"><tr><th>Software</th><th>Chave</th><th>Vencimento</th><th></th></tr></thead>
                         <tbody>
-                            <tr th:each="user : ${listaUsuarios}">
-                                <td class="fw-bold" th:text="${user.username}">admin</td>
+                            <tr th:each="lic : ${listaLicencas}">
                                 <td>
-                                    <span th:if="${user.role == 'ADMIN'}" class="badge bg-danger">ADMIN</span>
-                                    <span th:if="${user.role == 'USER'}" class="badge bg-secondary">USER</span>
+                                    <strong th:text="${lic.nomeSoftware}"></strong><br>
+                                    <small class="text-muted" th:text="${lic.colaborador != null ? lic.colaborador.nome : 'Disponível'}"></small>
+                                </td>
+                                <td><code th:text="${lic.chaveAtivacao}"></code></td>
+                                <td>
+                                    <span th:text="${#temporals.format(lic.dataExpiracao, 'dd/MM/yyyy')}"></span>
+                                    <span th:if="${lic.isVencendo()}" class="badge bg-danger">Vence Logo</span>
                                 </td>
                                 <td class="text-end">
-                                    <a th:if="${user.username != 'admin'}" 
-                                       th:href="@{/usuarios/deletar/{id}(id=${user.id})}" 
-                                       class="btn btn-sm btn-outline-danger" 
-                                       onclick="return confirm('Remover acesso deste usuário?');">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
+                                    <a th:href="@{/licencas/deletar/{id}(id=${lic.id})}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
                                 </td>
                             </tr>
                         </tbody>

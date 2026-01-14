@@ -36,25 +36,29 @@
 <body class="bg-light">
 
 <nav class="navbar navbar-expand-lg navbar-dark navbar-rei mb-4 shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/ativos"><i class="bi bi-speedometer2 text-danger"></i> ITAM</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="/ativos">Ativos</a></li>
-                <li class="nav-item"><a class="nav-link active fw-bold" href="/funcionarios">Colaboradores</a></li>
-                <li class="nav-item">
-    <a class="nav-link" href="/usuarios">Usuários</a>
-</li>
-            </ul>
-            <form th:action="@{/logout}" method="post" class="d-flex">
-                <button class="btn btn-outline-light btn-sm" type="submit">Sair <i class="bi bi-box-arrow-right"></i></button>
-            </form>
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/ativos">
+                <i class="bi bi-speedometer2 text-danger"></i> ITAM | Rei dos Motores
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/ativos">Ativos</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-bold" href="/funcionarios">Colaboradores</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/usuarios">Usuários</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/linhas">Telefonia</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/licencas">Softwares</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/manutencoes">Manutenções</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/acessorios">Acessórios</a></li>
+                </ul>
+                <form th:action="@{/logout}" method="post" class="d-flex">
+                    <button class="btn btn-outline-light btn-sm" type="submit">Sair <i class="bi bi-box-arrow-right"></i></button>
+                </form>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
 <div class="container">
     <h2 class="mb-4 text-secondary"><i class="bi bi-people-fill text-danger"></i> Gerenciar Equipe</h2>
@@ -78,6 +82,8 @@
                                 <option value="Oficina">Oficina/Mecânica</option>
                                 <option value="Logística">Logística</option>
                                 <option value="Vendas">Vendas</option>
+                                <option value="Estoque">Estoque/Almoxarifado</option>
+                                <option value="Marketing">Marketing</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -99,6 +105,7 @@
                                 <th>Nome</th>
                                 <th>Setor</th>
                                 <th>Email</th>
+                                <th class="text-end">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -106,9 +113,16 @@
                                 <td class="fw-bold text-dark" th:text="${func.nome}">João</td>
                                 <td><span class="badge bg-secondary" th:text="${func.departamento}">TI</span></td>
                                 <td class="text-muted small" th:text="${func.email}">joao@email.com</td>
+                                <td class="text-end">
+                                    <a th:href="@{/funcionarios/deletar/{id}(id=${func.id})}" 
+                                       class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('Tem certeza que deseja remover este colaborador?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(listaFuncionarios)}">
-                                <td colspan="3" class="text-center text-muted py-3">Nenhum funcionário cadastrado.</td>
+                                <td colspan="4" class="text-center text-muted py-3">Nenhum funcionário cadastrado.</td>
                             </tr>
                         </tbody>
                     </table>

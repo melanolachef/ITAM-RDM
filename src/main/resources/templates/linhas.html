@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Linhas - Rei dos Motores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root { --rei-red: #d90429; --rei-black: #1a1a1a; }
+        .navbar-rei { background-color: var(--rei-black); border-bottom: 3px solid var(--rei-red); }
+        .btn-rei { background-color: var(--rei-red); color: white; border: none; font-weight: 600; }
+        .btn-rei:hover { background-color: #d18f9a; color: white; }
+        .card-header-rei { border-bottom: 2px solid var(--rei-red); background-color: white; color: var(--rei-black); font-weight: bold; }
+        
+        .alerta-pisca { color: #775357; font-weight: bold; }
+        @keyframes piscar { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-rei mb-4 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/ativos">
+                <i class="bi bi-speedometer2 text-danger"></i> ITAM | Rei dos Motores
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/ativos">Ativos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/funcionarios">Colaboradores</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/usuarios">Usuários</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-bold" href="/linhas">Telefonia</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/licencas">Softwares</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/manutencoes">Manutenções</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/acessorios">Acessórios</a></li>
+                </ul>
+                <form th:action="@{/logout}" method="post" class="d-flex">
+                    <button class="btn btn-outline-light btn-sm" type="submit">Sair <i class="bi bi-box-arrow-right"></i></button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+<div class="container">
+    <h2 class="mb-4 text-secondary"><i class="bi bi-phone-vibrate text-danger"></i> Gestão de Telefonia</h2>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header card-header-rei py-3">Nova Linha</div>
+                <div class="card-body">
+                    <form th:action="@{/linhas/salvar}" th:object="${novaLinha}" method="post">
+                        
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold">Número</label>
+                            <input type="text" th:field="*{numero}" class="form-control" placeholder="(00) 90000-0000" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="small text-muted fw-bold">Operadora</label>
+                                <select th:field="*{operadora}" class="form-select">
+                                    <option value="Vivo">Vivo</option>
+                                    <option value="Claro">Claro</option>
+                                    <option value="Tim">Tim</option>
+                                    <option value="Oi">Oi</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="small text-muted fw-bold">Tipo</label>
+                                <select th:field="*{tipo}" class="form-select" id="tipoSelect" onchange="alternarCampos()">
+                                    <option value="PRE">Pré-Pago</option>
+                                    <option value="POS">Pós-Pago</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="divPre">
+                            <label class="small text-muted fw-bold">Próxima Recarga</label>
+                            <input type="date" th:field="*{dataRecarga}" class="form-control">
+                            <small class="text-muted" style="font-size: 0.7rem;">Data exata que expiram os créditos</small>
+                        </div>
+
+                        <div class="mb-3" id="divPos" style="display: none;">
+                            <label class="small text-muted fw-bold">Dia de Vencimento</label>
+                            <select th:field="*{diaVencimento}" class="form-select">
+                                <option th:each="i : ${#numbers.sequence(1, 31)}" th:value="${i}" th:text="${i}"></option>
+                            </select>
+                            <small class="text-muted" style="font-size: 0.7rem;">Dia fixo de pagamento todo mês</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold">Responsável</label>
+                            <select th:field="*{responsavel}" class="form-select">
+                                <option value="">-- Sem Uso --</option>
+                                <option th:each="func : ${listaFuncionarios}" 
+                                        th:value="${func.id}" 
+                                        th:text="${func.nome}"></option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-rei w-100">Salvar Linha</button>
+                    </form>
+                </div>
+            </div>
+                    </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <table class="table table-striped table-hover mb-0 align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Número</th>
+                                <th>Tipo</th>
+                                <th>Responsável</th>
+                                <th>Status Pagto.</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="linha : ${listaLinhas}">
+                                <td class="fw-bold">
+                                    <span th:text="${linha.numero}"></span>
+                                    <br>
+                                    <small class="text-muted" th:text="${linha.operadora}"></small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning text-dark" th:if="${linha.tipo == 'PRE'}">PRÉ</span>
+                                    <span class="badge bg-info text-dark" th:if="${linha.tipo == 'POS'}">PÓS</span>
+                                </td>
+                                <td>
+                                    <span th:if="${linha.responsavel != null}" th:text="${linha.responsavel.nome}"></span>
+                                    <span th:if="${linha.responsavel == null}" class="text-muted small">Estoque</span>
+                                </td>
+                                
+                                <td>
+                                    <div th:if="${linha.tipo == 'PRE'}">
+                                        <small class="text-muted">Expira em:</small><br>
+                                        <span th:text="${#temporals.format(linha.dataRecarga, 'dd/MM/yyyy')}"></span>
+                                    </div>
+
+                                    <div th:if="${linha.tipo == 'POS'}">
+                                        <small class="text-muted">Vence dia:</small> 
+                                        <strong th:text="${linha.diaVencimento}"></strong>
+                                    </div>
+
+                                    <div th:if="${linha.isAlertaRecarga()}">
+                                        <span class="badge bg-danger mt-1 alerta-pisca">
+                                            <i class="bi bi-exclamation-circle-fill"></i> ATENÇÃO
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <a th:href="@{/linhas/deletar/{id}(id=${linha.id})}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function alternarCampos() {
+        var tipo = document.getElementById("tipoSelect").value;
+        var divPre = document.getElementById("divPre");
+        var divPos = document.getElementById("divPos");
+
+        if (tipo === "POS") {
+            divPre.style.display = "none";
+            divPos.style.display = "block";
+        } else {
+            divPre.style.display = "block";
+            divPos.style.display = "none";
+        }
+    }
+    // Roda ao iniciar
+    window.onload = alternarCampos;
+</script>
+
+</body>
+</html>
