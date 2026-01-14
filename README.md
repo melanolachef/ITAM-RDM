@@ -40,7 +40,7 @@ O sistema foi modularizado para atender a diferentes vertentes da gestão de TI:
 O projeto foi desenvolvido seguindo padrões de arquitetura MVC (Model-View-Controller) e boas práticas de engenharia de software.
 
 **Backend e Infraestrutura**
-* **Java 17:** Linguagem base do projeto.
+* **Java 21:** Linguagem base do projeto.
 * **Spring Boot 3:** Framework para agilidade na configuração e desenvolvimento.
 * **Spring Data JPA:** Camada de persistência e abstração de banco de dados.
 * **Spring Security:** Gestão de autenticação, autorização e criptografia de senhas.
