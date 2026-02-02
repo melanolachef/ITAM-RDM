@@ -1,13 +1,8 @@
 package com.reidosmotores.itam.config;
 
-import com.reidosmotores.itam.model.Usuario;
-import com.reidosmotores.itam.repository.UsuarioRepository;
-// Removemos as importações manuais complexas que estavam falhando
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,25 +11,25 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity // Permite usar @PreAuthorize nos Controllers e sec:authorize no HTML
 public class SecurityConfig {
 
-    // 1. Criptografador de Senhas
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    // 2. Configuração das Rotas
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // 1. DESATIVA A PROTEÇÃO CSRF (Resolve o problema do login recarregar sem entrar)
+            .csrf(csrf -> csrf.disable()) 
+            
             .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                // Libera o acesso aos arquivos visuais (CSS, JS, Imagens) antes do login
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/static/**").permitAll()
+                // Todo o resto exige estar logado
                 .anyRequest().authenticated()
             )
             .formLogin((form) -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/ativos", true)
+                .loginPage("/login")           // Aponta para o seu Controller @GetMapping("/login")
+                .defaultSuccessUrl("/", true)  // FORÇA ir para o Dashboard após logar
+                .failureUrl("/login?error")    // Se errar a senha, volta com erro na URL
                 .permitAll()
             )
             .logout((logout) -> logout
@@ -46,26 +41,9 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 3. Gerenciador de Autenticação (VERSÃO SIMPLIFICADA)
-    // O Spring pega automaticamente nosso AutenticacaoService e o PasswordEncoder
+    // Bean OBRIGATÓRIO para a senha funcionar
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
-    // 4. Criação do Usuário Admin Inicial
-    @Bean
-    public CommandLineRunner criarUsuarioAdmin(UsuarioRepository repository, PasswordEncoder encoder) {
-        return args -> {
-            if (repository.count() == 0) {
-                Usuario admin = new Usuario();
-                admin.setUsername("admin");
-                admin.setPassword(encoder.encode("123456"));
-                admin.setRole("ADMIN");
-                
-                repository.save(admin);
-                System.out.println(">>> USUÁRIO ADMIN CRIADO NO BANCO COM SUCESSO! <<<");
-            }
-        };
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

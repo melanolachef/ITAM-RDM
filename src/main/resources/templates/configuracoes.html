@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurações | ITAM SaaS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style th:inline="css">
+        :root {
+            --sidebar-width: 260px;
+            --primary-color: [[${globalConfig.corPrimaria}]]; 
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; overflow-x: hidden; }
+        .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg); color: #9ca3af; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; z-index: 1000; }
+        
+        /* LOGO / BRAND */
+        .brand { 
+            color: white; 
+            font-size: 1.4rem; 
+            font-weight: 800; 
+            margin-bottom: 40px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            text-decoration: none; 
+            letter-spacing: -0.5px;
+        }
+        .brand:hover { color: white; opacity: 0.9; }
+
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: #d1d5db; text-decoration: none; border-radius: 8px; margin-bottom: 2px; transition: all 0.2s; font-weight: 500; font-size: 0.9rem; }
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        
+        .nav-link.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        
+        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
+        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
+        .saas-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="/" class="brand">
+            <i class="bi bi-cpu-fill" style="color: var(--primary-color);"></i> 
+            <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
+        </a>
+        
+        <nav>
+            <div class="menu-label">Principal</div>
+            <a href="/" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Painel de Controle</a>
+            <div class="menu-label">Inventário</div>
+            <a href="/ativos" class="nav-link"><i class="bi bi-pc-display"></i> Ativos de TI</a>
+            <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
+            <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
+            <div class="menu-label">Sistema</div>
+            <a href="/configuracoes" class="nav-link active"><i class="bi bi-gear-fill"></i> Configurações</a> 
+        </nav>
+        
+        <div class="mt-auto">
+            <form th:action="@{/logout}" method="post"><button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button></form>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h2 class="fw-bold m-0 text-dark mb-4">Personalização do Sistema</h2>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="saas-card h-100">
+                    <form th:action="@{/configuracoes/salvar}" th:object="${config}" method="post">
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Nome da Empresa / Sistema</label>
+                            <input type="text" th:field="*{nomeEmpresa}" class="form-control form-control-lg" placeholder="Ex: Lucas Tech">
+                            <div class="form-text">Isso altera o título na barra lateral.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Cor Primária (Tema)</label>
+                            <div class="d-flex gap-3 align-items-center">
+                                <input type="color" th:field="*{corPrimaria}" class="form-control form-control-color" style="width: 80px; height: 50px;">
+                                <span class="text-muted small">Clique para escolher a cor dos botões e menus.</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn text-white w-100 fw-bold p-3 mt-3" style="background-color: var(--primary-color);">
+                            <i class="bi bi-save me-2"></i> Salvar Alterações
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="saas-card bg-light text-center h-100 d-flex flex-column justify-content-center align-items-center border-0">
+                    <div class="p-4 rounded-circle bg-white shadow-sm mb-3">
+                        <i class="bi bi-palette fs-1" style="color: var(--primary-color);"></i>
+                    </div>
+                    <h5>Visualização em Tempo Real</h5>
+                    <p class="text-muted small w-75">Ao salvar, o sistema recarregará e aplicará a nova cor em todos os botões e menus ativos.</p>
+                    
+                    <div class="mt-3">
+                        <span class="badge rounded-pill px-3 py-2 text-white" style="background-color: var(--primary-color);">Exemplo de Badge</span>
+                        <button class="btn btn-sm text-white ms-2" style="background-color: var(--primary-color); border: none;">Exemplo Botão</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

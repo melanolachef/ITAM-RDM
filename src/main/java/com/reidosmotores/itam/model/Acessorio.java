@@ -15,11 +15,14 @@ public class Acessorio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nome; // Ex: Mouse Logitech, Teclado Dell
-    private String categoria; // Periférico, Cabos, Áudio
+    private String nome;        // Ex: Mouse Logitech, Teclado Dell
+    private String categoria;   // Periférico, Cabos, Áudio
     
-    private Integer quantidade; // Saldo atual
-    private Integer estoqueMinimo; // Para gerar alerta de compra
+    // NOVO: Onde isso está guardado fisicamente?
+    private String localizacao; // Ex: Armário TI - Prateleira 2, Gaveta B
+    
+    private Integer quantidade;     // Saldo atual
+    private Integer estoqueMinimo;  // Para gerar alerta de compra
 
     // Método para saber se precisa comprar
     public boolean isEstoqueBaixo() {

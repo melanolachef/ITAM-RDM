@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | ITAM SaaS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style th:inline="css">
+        :root {
+            --sidebar-width: 260px;
+            /* Se vier vazio, usa vermelho por segurança */
+            --primary-color: [[${globalConfig.corPrimaria}]] ; 
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; overflow-x: hidden; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg);
+            color: #9ca3af; position: fixed; top: 0; left: 0;
+            display: flex; flex-direction: column; padding: 20px; z-index: 1000;
+        }
+
+        /* --- LOGO GRANDE E BONITO --- */
+        .brand { 
+            color: white; 
+            font-size: 1.4rem; /* Fonte maior */
+            font-weight: 800; /* Negrito forte */
+            margin-bottom: 40px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            text-decoration: none; /* Remove sublinhado */
+            letter-spacing: -0.5px;
+        }
+        .brand:hover { color: white; opacity: 0.9; }
+
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+            color: #d1d5db; text-decoration: none; border-radius: 8px; margin-bottom: 2px;
+            transition: all 0.2s; font-weight: 500; font-size: 0.9rem;
+        }
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
+
+        /* CONTENT */
+        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
+        
+        /* CARDS */
+        .kpi-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; transition: transform 0.2s; }
+        .kpi-card:hover { transform: translateY(-5px); }
+        .kpi-title { font-size: 0.8rem; color: #6b7280; font-weight: 600; text-transform: uppercase; }
+        .kpi-value { font-size: 2rem; font-weight: 800; color: #111827; margin-top: 5px; }
+        .kpi-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        
+        .bg-icon-blue { background-color: #eff6ff; color: #3b82f6; }
+        .bg-icon-green { background-color: #f0fdf4; color: #22c55e; }
+        .bg-icon-purple { background-color: #f5f3ff; color: #8b5cf6; }
+        .bg-icon-red { background-color: #fef2f2; color: #ef4444; }
+
+        .table-card { background: white; border-radius: 16px; box-shadow: var(--card-shadow); overflow: hidden; }
+        .table thead th { background-color: #f9fafb; font-size: 0.75rem; text-transform: uppercase; color: #6b7280; font-weight: 700; border-bottom: 1px solid #e5e7eb; }
+    
+        /* Classe especial para botões personalizados */
+        .btn-custom {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            font-weight: bold;
+        }
+        /* Fallback: Se a variavel falhar, usa uma cor cinza escura para o texto não sumir */
+        .btn-custom:not([style*="background-color"]) {
+            background-color: #333; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="/" class="brand">
+            <i class="bi bi-cpu-fill" style="color: var(--primary-color);"></i> 
+            <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
+        </a>
+        
+        <nav>
+            <div class="menu-label">Principal</div>
+            <a href="/" class="nav-link active"><i class="bi bi-grid-1x2-fill"></i> Painel de Controle</a>
+            
+            <div class="menu-label">Inventário</div>
+            <a href="/ativos" class="nav-link"><i class="bi bi-pc-display"></i> Ativos de TI</a>
+            <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
+            <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
+            
+            <div class="menu-label">Pessoas & Acesso</div>
+            <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
+            <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
+
+            <div class="menu-label">Gestão</div>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças & Soft</a>
+            <a href="/compras" class="nav-link"><i class="bi bi-cart-fill"></i> Compras <span class="badge bg-danger ms-auto" style="font-size:0.6rem">Novo</span></a>
+            <a href="/manutencoes" class="nav-link"><i class="bi bi-tools"></i> Manutenções</a>
+            <a href="/configuracoes" class="nav-link"><i class="bi bi-gear-fill"></i> Configurações</a>
+        </nav>
+
+        <div class="mt-auto">
+            <form th:action="@{/logout}" method="post">
+                <button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-bold m-0 text-dark">Painel de Controle</h2>
+                <p class="text-muted m-0">Bem-vindo ao sistema de gestão, <strong>Lucas</strong>.</p>
+            </div>
+            <div class="d-flex gap-3">
+                <a href="/ativos" class="btn btn-custom px-4"><i class="bi bi-plus-lg"></i> Novo Ativo</a>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="kpi-card d-flex align-items-start justify-content-between">
+                    <div>
+                        <div class="kpi-title">Total de Ativos</div>
+                        <div class="kpi-value" th:text="${totalAtivos}">0</div>
+                        <small class="text-success fw-bold"><i class="bi bi-arrow-up"></i> Base Atualizada</small>
+                    </div>
+                    <div class="kpi-icon bg-icon-blue"><i class="bi bi-pc-display-horizontal"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="kpi-card d-flex align-items-start justify-content-between">
+                    <div>
+                        <div class="kpi-title">Funcionários</div>
+                        <div class="kpi-value" th:text="${totalFuncionarios}">0</div>
+                        <small class="text-muted">Cadastrados</small>
+                    </div>
+                    <div class="kpi-icon bg-icon-purple"><i class="bi bi-people"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="kpi-card d-flex align-items-start justify-content-between">
+                    <div>
+                        <div class="kpi-title">Acessórios</div>
+                        <div class="kpi-value" th:text="${totalAcessorios}">0</div>
+                        <small class="text-danger fw-bold" th:if="${totalAcessorios < 5}"><i class="bi bi-exclamation-circle"></i> Estoque Baixo</small>
+                        <small class="text-success fw-bold" th:unless="${totalAcessorios < 5}">Estoque OK</small>
+                    </div>
+                    <div class="kpi-icon bg-icon-green"><i class="bi bi-mouse"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="kpi-card d-flex align-items-start justify-content-between">
+                    <div>
+                        <div class="kpi-title">Processos Compra</div>
+                        <div class="kpi-value" th:text="${totalProcessos}">0</div>
+                        <small class="text-warning fw-bold">Em andamento</small>
+                    </div>
+                    <div class="kpi-icon bg-icon-red"><i class="bi bi-cart"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-8">
+                <h5 class="fw-bold mb-3 text-dark">Solicitações Recentes</h5>
+                <div class="table-card p-0">
+                    <table class="table mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th class="ps-4 py-3">Software</th>
+                                <th>Solicitante</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${comprasRecentes}">
+                                <td class="ps-4 fw-bold text-dark" th:text="${c.software}"></td>
+                                <td class="text-muted" th:text="${c.solicitante}"></td>
+                                <td><span class="badge bg-light text-dark border" th:text="${c.status}"></span></td>
+                                <td class="text-end pe-4 text-muted" th:text="${#temporals.format(c.dataSolicitacao, 'dd/MM/yyyy')}"></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(comprasRecentes)}">
+                                <td colspan="4" class="text-center py-4 text-muted">Nenhuma solicitação recente.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <h5 class="fw-bold mb-3 text-dark">Acesso Rápido</h5>
+                <div class="kpi-card p-0 overflow-hidden">
+                    <div class="list-group list-group-flush">
+                        <a href="/compras" class="list-group-item list-group-item-action p-3 d-flex align-items-center gap-3">
+                            <i class="bi bi-plus-circle-fill fs-5" style="color: var(--primary-color);"></i>
+                            <div><div class="fw-bold">Nova Solicitação</div><small class="text-muted">Pedir software/hardware</small></div>
+                        </a>
+                        <a href="/ativos" class="list-group-item list-group-item-action p-3 d-flex align-items-center gap-3">
+                            <i class="bi bi-qr-code text-dark fs-5"></i>
+                            <div><div class="fw-bold">Cadastrar Ativo</div><small class="text-muted">Registrar computador</small></div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

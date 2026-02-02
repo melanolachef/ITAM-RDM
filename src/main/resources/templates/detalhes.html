@@ -1,84 +1,114 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Detalhes do Ativo</title>
+    <title>Detalhes do Ativo | ITAM SaaS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --rei-red: #d90429;
-            --rei-black: #1a1a1a;
+    
+    <style th:inline="css">  :root {
+        --sidebar-width: 260px;
+        --primary-color: [[${globalConfig.corPrimaria}]]; /* Cor Dinâmica */
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        .navbar-rei {
-            background-color: var(--rei-black);
-            border-bottom: 3px solid var(--rei-red);
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; overflow-x: hidden; }
+        .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg); color: #9ca3af; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; z-index: 1000; }
+        .brand { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: #d1d5db; text-decoration: none; border-radius: 8px; margin-bottom: 2px; transition: all 0.2s; font-weight: 500; font-size: 0.9rem; }
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4); }
+        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
+        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
+        .saas-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-rei mb-4 shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/ativos"><i class="bi bi-speedometer2 text-danger"></i> ITAM</a>
-        <div class="navbar-nav ms-auto">
-             <form th:action="@{/logout}" method="post" class="d-flex">
-                <button class="btn btn-outline-light btn-sm" type="submit">Sair <i class="bi bi-box-arrow-right"></i></button>
-            </form>
+    <div class="sidebar">
+        <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
+        <nav>
+            <div class="menu-label">Principal</div>
+            <a href="/" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Painel de Controle</a>
+            <div class="menu-label">Inventário</div>
+            <a href="/ativos" class="nav-link active"><i class="bi bi-pc-display"></i> Ativos de TI</a>
+            <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
+            <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
+            <div class="menu-label">Pessoas & Acesso</div>
+            <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
+            <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
+            <div class="menu-label">Gestão</div>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças & Soft</a>
+            <a href="/compras" class="nav-link"><i class="bi bi-cart-fill"></i> Compras</a>
+            <a href="/manutencoes" class="nav-link"><i class="bi bi-tools"></i> Manutenções</a>
+        </nav>
+        <div class="mt-auto">
+            <form th:action="@{/logout}" method="post"><button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button></form>
         </div>
     </div>
-</nav>
 
-<div class="container">
-    <a href="/ativos" class="btn btn-outline-dark mb-3"><i class="bi bi-arrow-left"></i> Voltar</a>
-
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-dark text-white fw-bold" style="border-bottom: 3px solid #d90429;">
-                    Ficha do Ativo
-                </div>
-                <div class="card-body text-center">
-                    <h1 class="text-danger fw-bold" th:text="${ativo.patrimonio}">RM-001</h1>
-                    <h4 th:text="${ativo.modelo}" class="fw-bold">Dell G15</h4>
-                    <span class="badge bg-secondary mb-3" th:text="${ativo.tipo}">Notebook</span>
-                    
-                    <hr>
-                    <p class="text-muted mb-1 small fw-bold text-uppercase">Responsável Atual</p>
-                    <h5 th:if="${ativo.responsavel != null}" th:text="${ativo.responsavel.nome}" class="text-dark">João</h5>
-                    <h5 th:if="${ativo.responsavel == null}" class="text-muted fst-italic">Estoque</h5>
-                    
-                    <p class="text-muted mb-1 mt-3 small fw-bold text-uppercase">Status</p>
-                    <span class="badge rounded-pill bg-success" th:if="${ativo.status == 'DISPONIVEL'}">DISPONÍVEL</span>
-                    <span class="badge rounded-pill bg-dark" th:if="${ativo.status == 'EM_USO'}">EM USO</span>
-                    <span class="badge rounded-pill bg-warning text-dark" th:if="${ativo.status == 'MANUTENCAO'}">MANUTENÇÃO</span>
-                </div>
-            </div>
+    <div class="main-content">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <a href="/ativos" class="btn btn-white border bg-white shadow-sm rounded-circle"><i class="bi bi-arrow-left"></i></a>
+            <h2 class="fw-bold m-0 text-dark">Ficha Técnica</h2>
         </div>
 
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white fw-bold py-3 border-bottom">
-                    <i class="bi bi-clock-history text-danger"></i> Histórico de Movimentações
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item" th:each="hist : ${historico}">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1 fw-bold text-dark" th:text="${hist.descricao}">Transferência</h6>
-                                <small class="text-muted" th:text="${hist.dataFormatada}">12/01/2026 14:30</small>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="saas-card h-100 text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-laptop fs-1 text-secondary opacity-25"></i>
+                    </div>
+                    <h1 class="text-danger fw-bold m-0" th:text="${ativo.patrimonio}">RM-001</h1>
+                    <h5 th:text="${ativo.modelo}" class="fw-bold text-dark mt-2">Dell G15</h5>
+                    <span class="badge bg-light text-dark border mt-1" th:text="${ativo.tipo}">Notebook</span>
+                    
+                    <hr class="my-4 opacity-25">
+                    
+                    <div class="text-start px-3">
+                        <p class="text-muted mb-1 small fw-bold text-uppercase">Responsável</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-person-circle fs-4 text-secondary"></i>
+                            <div>
+                                <h6 th:if="${ativo.responsavel != null}" th:text="${ativo.responsavel.nome}" class="text-dark m-0 fw-bold">João</h6>
+                                <h6 th:if="${ativo.responsavel == null}" class="text-muted fst-italic m-0">Em Estoque</h6>
                             </div>
-                        </li>
-                        <li class="list-group-item text-center text-muted" th:if="${#lists.isEmpty(historico)}">
-                            <i class="bi bi-info-circle"></i> Nenhum histórico registrado ainda.
-                        </li>
-                    </ul>
+                        </div>
+
+                        <p class="text-muted mb-1 mt-4 small fw-bold text-uppercase">Status Atual</p>
+                        <span class="badge rounded-pill bg-success" th:if="${ativo.status == 'DISPONIVEL'}">DISPONÍVEL</span>
+                        <span class="badge rounded-pill bg-dark" th:if="${ativo.status == 'EM_USO'}">EM USO</span>
+                        <span class="badge rounded-pill bg-warning text-dark" th:if="${ativo.status == 'MANUTENCAO'}">MANUTENÇÃO</span>
+                        <span class="badge rounded-pill bg-danger" th:if="${ativo.status == 'DESCARTE'}">DESCARTE</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="saas-card h-100">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-clock-history text-danger me-2"></i> Histórico de Eventos</h5>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item border-0 ps-0" th:each="hist : ${historico}">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-dark" th:text="${hist.descricao}">Transferência</h6>
+                                    <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> <span th:text="${hist.dataFormatada}"></span></small>
+                                </div>
+                                <i class="bi bi-chevron-right text-muted small"></i>
+                            </div>
+                        </div>
+                        <div class="text-center text-muted py-5" th:if="${#lists.isEmpty(historico)}">
+                            <i class="bi bi-info-circle fs-4 d-block mb-2"></i>
+                            Nenhum histórico registrado ainda.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

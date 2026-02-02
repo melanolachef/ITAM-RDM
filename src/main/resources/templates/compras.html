@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Compras | ITAM SaaS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        /* REUTILIZAR O MESMO CSS DO DASHBOARD/ACESSORIOS AQUI */
+        :root { --sidebar-width: 260px; --primary-color: #d90429; --dark-bg: #111827; --light-bg: #f3f4f6; --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; overflow-x: hidden; }
+        .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg); color: #9ca3af; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; z-index: 1000; }
+        .brand { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: #d1d5db; text-decoration: none; border-radius: 8px; margin-bottom: 2px; transition: all 0.2s; font-weight: 500; font-size: 0.9rem; }
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4); }
+        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
+        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
+        .saas-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; }
+
+        /* ESTILOS DO FLUXO (MAPA) */
+        .process-step { text-align: center; position: relative; z-index: 1; }
+        .process-icon { width: 50px; height: 50px; background: white; border: 2px solid #dee2e6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.2rem; color: #6c757d; transition: all 0.3s; }
+        .process-line { position: absolute; top: 25px; left: 0; width: 100%; height: 3px; background-color: #dee2e6; z-index: -1; transform: translateY(-50%); }
+        .step-active .process-icon { border-color: var(--primary-color); color: var(--primary-color); background-color: #fff0f3; }
+        .step-title { font-size: 0.8rem; font-weight: 700; color: #495057; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
+        <nav>
+            <div class="menu-label">Principal</div>
+            <a href="/" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Painel de Controle</a>
+            <div class="menu-label">Inventário</div>
+            <a href="/ativos" class="nav-link"><i class="bi bi-pc-display"></i> Ativos de TI</a>
+            <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
+            <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
+            <div class="menu-label">Pessoas & Acesso</div>
+            <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
+            <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
+            <div class="menu-label">Gestão</div>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças & Soft</a>
+            <a href="/compras" class="nav-link active"><i class="bi bi-cart-fill"></i> Compras</a> <a href="/manutencoes" class="nav-link"><i class="bi bi-tools"></i> Manutenções</a>
+        </nav>
+        <div class="mt-auto">
+            <form th:action="@{/logout}" method="post"><button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button></form>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div><h2 class="fw-bold m-0 text-dark">Aquisições & Renovações</h2><p class="text-muted m-0">Workflow de compras de software e hardware.</p></div>
+        </div>
+
+        <div class="saas-card mb-4 p-4">
+            <h6 class="fw-bold mb-4 text-center text-uppercase text-muted small">Fluxo Atual de Aprovação</h6>
+            <div class="row">
+                <div class="col-3 process-step step-active"><div class="process-line" style="left: 50%; width: 50%;"></div><div class="process-icon"><i class="bi bi-pencil"></i></div><div class="step-title">1. Pedido</div></div>
+                <div class="col-3 process-step step-active"><div class="process-line"></div><div class="process-icon"><i class="bi bi-cpu"></i></div><div class="step-title">2. Análise TI</div></div>
+                <div class="col-3 process-step step-active"><div class="process-line"></div><div class="process-icon"><i class="bi bi-currency-dollar"></i></div><div class="step-title">3. Financeiro</div></div>
+                <div class="col-3 process-step step-active"><div class="process-line" style="width: 50%;"></div><div class="process-icon"><i class="bi bi-check-lg"></i></div><div class="step-title">4. Deploy</div></div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="saas-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fw-bold text-dark">Nova Demanda</span>
+                        <i class="bi bi-cart-plus text-danger fs-5"></i>
+                    </div>
+                    <form th:action="@{/compras/salvar}" th:object="${novaSolicitacao}" method="post">
+                        <div class="mb-3"><label class="form-label small fw-bold text-muted">Item / Software</label><input type="text" th:field="*{software}" class="form-control" placeholder="Ex: Adobe Photoshop" required></div>
+                        <div class="mb-3"><label class="form-label small fw-bold text-muted">Solicitante</label><input type="text" th:field="*{solicitante}" class="form-control" required></div>
+                        <div class="row mb-3">
+                            <div class="col-6"><label class="form-label small fw-bold text-muted">Tipo</label><select th:field="*{tipo}" class="form-select"><option value="Mensal">Mensal</option><option value="Anual">Anual</option><option value="Unica">Única</option></select></div>
+                            <div class="col-6"><label class="form-label small fw-bold text-muted">Urgência</label><select th:field="*{prioridade}" class="form-select"><option value="Normal">Normal</option><option value="Alta">Alta</option></select></div>
+                        </div>
+                        <button type="submit" class="btn btn-dark w-100 fw-bold">Registrar</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="saas-card p-0 overflow-hidden h-100">
+                    <div class="p-3 border-bottom"><span class="fw-bold text-secondary">Pedidos em Andamento</span></div>
+                    <div class="table-responsive">
+                        <table class="table mb-0 align-middle">
+                            <thead class="bg-light text-muted small"><tr><th class="ps-4">Item</th><th>Solicitante</th><th>Fase Atual</th><th class="text-end pe-4">Ação</th></tr></thead>
+                            <tbody>
+                                <tr th:each="c : ${lista}">
+                                    <td class="ps-4"><strong class="text-dark" th:text="${c.software}"></strong><br><small class="text-muted" th:text="${c.tipo}"></small></td>
+                                    <td th:text="${c.solicitante}"></td>
+                                    <td><span class="badge rounded-pill border text-dark bg-light" th:text="${c.status}"></span></td>
+                                    <td class="text-end pe-4">
+                                        <a th:if="${c.status != 'CONCLUIDO'}" th:href="@{/compras/avancar/{id}(id=${c.id})}" class="btn btn-sm btn-primary py-0" title="Avançar Etapa"><i class="bi bi-arrow-right"></i></a>
+                                        <a th:href="@{/compras/deletar/{id}(id=${c.id})}" class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

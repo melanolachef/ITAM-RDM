@@ -1,107 +1,185 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Acessórios | ITAM</title>
+    <title>Acessórios | ITAM SaaS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        :root { --rei-red: #d90429; --rei-black: #1a1a1a; }
-        .navbar-rei { background-color: var(--rei-black); border-bottom: 3px solid var(--rei-red); }
-        .btn-rei { background-color: var(--rei-red); color: white; border: none; font-weight: 600; }
-        .card-header-rei { border-bottom: 2px solid var(--rei-red); background-color: white; color: var(--rei-black); font-weight: bold; }
+    
+    <style th:inline="css">  :root {
+        --sidebar-width: 260px;
+        --primary-color: [[${globalConfig.corPrimaria}]]; /* Cor Dinâmica */
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; overflow-x: hidden; }
+
+        /* SIDEBAR PADRÃO */
+        .sidebar {
+            width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg);
+            color: #9ca3af; position: fixed; top: 0; left: 0;
+            display: flex; flex-direction: column; padding: 20px; z-index: 1000;
+        }
+        .brand { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+            color: #d1d5db; text-decoration: none; border-radius: 8px; margin-bottom: 2px;
+            transition: all 0.2s; font-weight: 500; font-size: 0.9rem;
+        }
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4); }
+        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
+
+        /* MAIN CONTENT */
+        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
+
+        /* ESTILOS ESPECÍFICOS DESTA PÁGINA */
+        .saas-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; }
+        .location-badge { font-size: 0.75rem; background-color: #f3f4f6; color: #4b5563; padding: 4px 8px; border-radius: 6px; border: 1px solid #e5e7eb; }
+        .table-hover tbody tr:hover { background-color: #f9fafb; }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-rei mb-4 shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="/ativos">
-                <i class="bi bi-speedometer2 text-danger"></i> ITAM | Rei dos Motores
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="/ativos">Ativos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/funcionarios">Colaboradores</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/usuarios">Usuários</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/linhas">Telefonia</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/licencas">Softwares</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/manutencoes">Manutenções</a></li>
-                    <li class="nav-item"><a class="nav-link active fw-bold" href="/acessorios">Acessórios</a></li>
-                </ul>
-                <form th:action="@{/logout}" method="post" class="d-flex">
-                    <button class="btn btn-outline-light btn-sm" type="submit">Sair <i class="bi bi-box-arrow-right"></i></button>
-                </form>
+    <div class="sidebar">
+        <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
+        
+        <nav>
+            <div class="menu-label">Principal</div>
+            <a href="/" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Painel de Controle</a>
+            
+            <div class="menu-label">Inventário</div>
+            <a href="/ativos" class="nav-link"><i class="bi bi-pc-display"></i> Ativos de TI</a>
+            <a href="/acessorios" class="nav-link active"><i class="bi bi-mouse-fill"></i> Acessórios</a> <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
+
+            <div class="menu-label">Pessoas & Acesso</div>
+            <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
+            <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
+
+            <div class="menu-label">Gestão</div>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças & Soft</a>
+            <a href="/compras" class="nav-link"><i class="bi bi-cart-fill"></i> Compras</a>
+            <a href="/manutencoes" class="nav-link"><i class="bi bi-tools"></i> Manutenções</a>
+            <a href="/configuracoes" class="nav-link"><i class="bi bi-gear-fill"></i> Configurações</a>
+        </nav>
+
+        <div class="mt-auto">
+            <form th:action="@{/logout}" method="post">
+                <button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold m-0 text-dark">Acessórios e Periféricos</h2>
+                <p class="text-muted m-0">Controle de itens menores e estoque de consumo.</p>
             </div>
         </div>
-    </nav>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header card-header-rei py-3">Novo Item</div>
-                <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="saas-card h-100">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-plus-circle text-danger me-2"></i>Entrada de Item</h5>
+                    
                     <form th:action="@{/acessorios/salvar}" th:object="${item}" method="post">
                         <input type="hidden" th:field="*{id}">
+                        
                         <div class="mb-3">
-                            <label class="fw-bold small">Nome</label>
-                            <input type="text" th:field="*{nome}" class="form-control" placeholder="Ex: Mouse USB" required>
+                            <label class="fw-bold small text-muted mb-1">Nome do Item</label>
+                            <input type="text" th:field="*{nome}" class="form-control" placeholder="Ex: Mouse USB Logitech" required>
                         </div>
+
                         <div class="mb-3">
-                            <label class="fw-bold small">Categoria</label>
+                            <label class="fw-bold small text-muted mb-1">Categoria</label>
                             <select th:field="*{categoria}" class="form-select">
-                                <option value="Periférico">Periférico</option>
-                                <option value="Audio">Áudio</option>
-                                <option value="Cabos">Cabos</option>
+                                <option value="Periférico">Periférico (Teclado/Mouse)</option>
+                                <option value="Audio">Áudio (Headset/Fone)</option>
+                                <option value="Cabos">Cabos e Adaptadores</option>
+                                <option value="Rede">Rede (Patch Cord/Switch)</option>
+                                <option value="Componentes">Componentes (Memória/SSD)</option>
                             </select>
                         </div>
-                        <div class="row mb-3">
+
+                        <div class="mb-3">
+                            <label class="fw-bold small text-muted mb-1">Localização Física</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-geo-alt"></i></span>
+                                <input type="text" th:field="*{localizacao}" class="form-control border-start-0 ps-0" placeholder="Ex: Armário TI - Gaveta 2">
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
                             <div class="col-6">
-                                <label class="fw-bold small">Qtd</label>
+                                <label class="fw-bold small text-muted mb-1">Saldo</label>
                                 <input type="number" th:field="*{quantidade}" class="form-control" value="1">
                             </div>
                             <div class="col-6">
-                                <label class="fw-bold small">Mínimo</label>
+                                <label class="fw-bold small text-muted mb-1">Mínimo</label>
                                 <input type="number" th:field="*{estoqueMinimo}" class="form-control" value="5">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-rei w-100">Adicionar</button>
+
+                        <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">Salvar Estoque</button>
                     </form>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-dark"><tr><th>Item</th><th class="text-center">Estoque</th><th class="text-end">Ações</th></tr></thead>
-                        <tbody>
-                            <tr th:each="a : ${lista}">
-                                <td>
-                                    <strong th:text="${a.nome}"></strong><br>
-                                    <small class="text-muted" th:text="${a.categoria}"></small>
-                                    <span th:if="${a.isEstoqueBaixo()}" class="badge bg-danger ms-2">COMPRAR</span>
-                                </td>
-                                <td class="text-center">
-                                    <a th:href="@{/acessorios/remove/{id}(id=${a.id})}" class="btn btn-sm btn-outline-secondary py-0 px-2 fw-bold">-</a>
-                                    <span class="mx-2 fw-bold fs-5" th:text="${a.quantidade}"></span>
-                                    <a th:href="@{/acessorios/add/{id}(id=${a.id})}" class="btn btn-sm btn-outline-success py-0 px-2 fw-bold">+</a>
-                                </td>
-                                <td class="text-end">
-                                    <a th:href="@{/acessorios/deletar/{id}(id=${a.id})}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="col-md-8">
+                <div class="saas-card p-0 overflow-hidden h-100">
+                    <div class="p-3 bg-white border-bottom">
+                        <span class="fw-bold text-secondary">Estoque Atual</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table mb-0 align-middle table-hover">
+                            <thead class="bg-light text-muted small text-uppercase">
+                                <tr>
+                                    <th class="ps-4">Item & Localização</th>
+                                    <th class="text-center">Qtd</th>
+                                    <th class="text-end pe-4">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="a : ${lista}">
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3 fs-4 text-secondary">
+                                                <i th:if="${a.categoria == 'Periférico'}" class="bi bi-mouse"></i>
+                                                <i th:if="${a.categoria == 'Audio'}" class="bi bi-headset"></i>
+                                                <i th:if="${a.categoria == 'Cabos'}" class="bi bi-usb-plug"></i>
+                                                <i th:if="${a.categoria == 'Rede'}" class="bi bi-router"></i>
+                                            </div>
+                                            <div>
+                                                <strong class="text-dark" th:text="${a.nome}"></strong>
+                                                <span th:if="${a.isEstoqueBaixo()}" class="badge bg-danger ms-1" style="font-size:0.6rem">BAIXO</span>
+                                                <div class="mt-1">
+                                                    <span class="location-badge"><i class="bi bi-geo-alt-fill text-danger me-1"></i> <span th:text="${a.localizacao}"></span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group shadow-sm" role="group">
+                                            <a th:href="@{/acessorios/remove/{id}(id=${a.id})}" class="btn btn-sm btn-outline-secondary px-2 border-end-0">-</a>
+                                            <button type="button" class="btn btn-sm btn-white border border-secondary text-dark fw-bold px-3" disabled th:text="${a.quantidade}"></button>
+                                            <a th:href="@{/acessorios/add/{id}(id=${a.id})}" class="btn btn-sm btn-outline-success px-2 border-start-0">+</a>
+                                        </div>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a th:href="@{/acessorios/deletar/{id}(id=${a.id})}" class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
 </body>
 </html>

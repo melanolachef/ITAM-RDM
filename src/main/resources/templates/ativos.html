@@ -1,211 +1,227 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>SCA - Rei dos Motores</title>
+    <title>Ativos de TI | ITAM SaaS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        :root {
-            --rei-red: #d90429;
-            --rei-black: #1a1a1a;
-            --rei-hover: #b00320;
+    <style th:inline="css">  :root {
+        --sidebar-width: 260px;
+        --primary-color: [[${globalConfig.corPrimaria}]]; /* Cor Dinâmica */
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        .navbar-rei {
-            background-color: var(--rei-black);
-            border-bottom: 3px solid var(--rei-red);
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; overflow-x: hidden; }
+
+        /* SIDEBAR (Igual ao Dashboard) */
+        .sidebar {
+            width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg);
+            color: #9ca3af; position: fixed; top: 0; left: 0;
+            display: flex; flex-direction: column; padding: 20px; z-index: 1000;
         }
-        .btn-rei {
-            background-color: var(--rei-red);
-            color: white;
-            border: none;
-            font-weight: 600;
+        .brand { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+            color: #d1d5db; text-decoration: none; border-radius: 8px; margin-bottom: 2px;
+            transition: all 0.2s; font-weight: 500; font-size: 0.9rem;
         }
-        .btn-rei:hover {
-            background-color: var(--rei-hover);
-            color: white;
-        }
-        .text-rei { color: var(--rei-red); }
-        .card-header-rei {
-            border-bottom: 2px solid var(--rei-red);
-            background-color: white;
-            color: var(--rei-black);
-            font-weight: bold;
-        }
-        .page-link { color: var(--rei-red); }
-        .page-link:hover { color: var(--rei-hover); }
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4); }
+        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
+
+        /* MAIN CONTENT */
+        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
+
+        /* CARDS & TABLES */
+        .saas-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; height: 100%; }
+        .card-header-clean { background: white; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 20px; font-weight: 700; color: #374151; font-size: 1.1rem; }
+        
+        .kpi-value { font-size: 2rem; font-weight: 800; color: #111827; }
+        .kpi-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: #6b7280; }
+
+        .table thead th { background-color: #f9fafb; font-size: 0.75rem; text-transform: uppercase; color: #6b7280; font-weight: 700; border-bottom: 1px solid #e5e7eb; }
+        .table-hover tbody tr:hover { background-color: #f9fafb; }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-rei mb-4 shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="/ativos">
-                <i class="bi bi-speedometer2 text-danger"></i> ITAM | Rei dos Motores
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link active fw-bold" href="/ativos">Ativos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/funcionarios">Colaboradores</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/usuarios">Usuários</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/linhas">Telefonia</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/licencas">Softwares</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/manutencoes">Manutenções</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/acessorios">Acessórios</a></li>
-                </ul>
-                <form th:action="@{/logout}" method="post" class="d-flex">
-                    <button class="btn btn-outline-light btn-sm" type="submit">Sair <i class="bi bi-box-arrow-right"></i></button>
-                </form>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container">
+    <div class="sidebar">
+        <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
         
-        <div class="row mb-4">
+        <nav>
+            <div class="menu-label">Principal</div>
+            <a href="/" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Painel de Controle</a>
+            
+            <div class="menu-label">Inventário</div>
+            <a href="/ativos" class="nav-link active"><i class="bi bi-pc-display"></i> Ativos de TI</a> <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
+            <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
+
+            <div class="menu-label">Pessoas & Acesso</div>
+            <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
+            <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
+
+            <div class="menu-label">Gestão</div>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças & Soft</a>
+            <a href="/compras" class="nav-link"><i class="bi bi-cart-fill"></i> Compras</a>
+            <a href="/manutencoes" class="nav-link"><i class="bi bi-tools"></i> Manutenções</a>
+        </nav>
+
+        <div class="mt-auto">
+            <form th:action="@{/logout}" method="post">
+                <button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold m-0 text-dark">Ativos de TI</h2>
+                <p class="text-muted m-0">Gerenciamento de hardware e equipamentos.</p>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
             <div class="col-md-4">
-                <div class="card text-white bg-dark shadow-sm h-100 border-0" style="border-left: 5px solid #d90429 !important;">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="card-title text-uppercase small opacity-75">Total de Ativos</h5>
-                            <h2 class="fw-bold" th:text="${qtdTotal}">0</h2>
-                        </div>
-                        <i class="bi bi-box-seam fs-1 text-danger"></i>
+                <div class="saas-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="kpi-label">Total Cadastrado</div>
+                        <div class="kpi-value" th:text="${qtdTotal}">0</div>
                     </div>
+                    <i class="bi bi-box-seam fs-1 text-danger opacity-25"></i>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card text-white bg-success shadow-sm h-100 border-0">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="card-title text-uppercase small opacity-75">Disponíveis</h5>
-                            <h2 class="fw-bold" th:text="${qtdDisponivel}">0</h2> 
-                        </div>
-                        <i class="bi bi-check-circle fs-1 opacity-50"></i>
+                <div class="saas-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="kpi-label text-success">Disponíveis</div>
+                        <div class="kpi-value text-success" th:text="${qtdDisponivel}">0</div>
                     </div>
+                    <i class="bi bi-check-circle fs-1 text-success opacity-25"></i>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card text-white bg-warning shadow-sm h-100 border-0">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <h5 class="card-title text-uppercase small opacity-75 text-dark">Em Manutenção</h5>
-                            <h2 class="fw-bold text-dark" th:text="${qtdManutencao}">0</h2>
-                        </div>
-                        <i class="bi bi-tools fs-1 opacity-50 text-dark"></i>
+                <div class="saas-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="kpi-label text-warning">Em Manutenção</div>
+                        <div class="kpi-value text-dark" th:text="${qtdManutencao}">0</div>
                     </div>
+                    <i class="bi bi-tools fs-1 text-warning opacity-50"></i>
                 </div>
             </div>
         </div>
 
-        <div class="row mb-4">
+        <div class="row g-4 mb-4">
             <div class="col-md-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-white fw-bold">Status do Estoque</div>
-                    <div class="card-body">
-                        <canvas id="statusChart"></canvas>
-                    </div>
+                <div class="saas-card">
+                    <div class="card-header-clean">Status do Estoque</div>
+                    <canvas id="statusChart" style="max-height: 200px;"></canvas>
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-white fw-bold">Equipamentos por Tipo</div>
-                    <div class="card-body">
-                        <canvas id="typeChart"></canvas>
-                    </div>
+                <div class="saas-card">
+                    <div class="card-header-clean">Equipamentos por Tipo</div>
+                    <canvas id="typeChart" style="max-height: 200px;"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-lg-4 mb-4">
-                <div class="card shadow-sm border-0" th:classappend="${novoAtivo.id != null} ? 'border-warning' : ''">
-                    <div class="card-header card-header-rei py-3">
-                        <span th:if="${novoAtivo.id == null}"><i class="bi bi-plus-circle text-rei"></i> Cadastrar Novo Ativo</span>
-                        <span th:if="${novoAtivo.id != null}"><i class="bi bi-pencil-square text-warning"></i> Editando: <span th:text="${novoAtivo.patrimonio}"></span></span>
+        <div class="row g-4">
+            
+            <div class="col-lg-4">
+                <div class="saas-card" th:classappend="${novoAtivo.id != null} ? 'border border-warning' : ''">
+                    <div class="card-header-clean">
+                        <span th:if="${novoAtivo.id == null}"><i class="bi bi-plus-circle text-danger"></i> Novo Cadastro</span>
+                        <span th:if="${novoAtivo.id != null}" class="text-warning"><i class="bi bi-pencil-square"></i> Editando Ativo</span>
                     </div>
-                    <div class="card-body">
-                        <form action="#" th:action="@{/ativos/salvar}" th:object="${novoAtivo}" method="post">
-                            <input type="hidden" th:field="*{id}" />
+                    
+                    <form action="#" th:action="@{/ativos/salvar}" th:object="${novoAtivo}" method="post">
+                        <input type="hidden" th:field="*{id}" />
 
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Patrimônio</label>
-                                <input type="text" th:field="*{patrimonio}" class="form-control" placeholder="Ex: RM-001" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Tipo</label>
-                                <select th:field="*{tipo}" class="form-select">
-                                    <option value="Notebook">Notebook</option>
-                                    <option value="Desktop">Desktop</option>
-                                    <option value="Monitor">Monitor</option>
-                                    <option value="Celular">Celular Corporativo</option>
-                                    <option value="Impressora">Impressora</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Modelo</label>
-                                <input type="text" th:field="*{modelo}" class="form-control" placeholder="Ex: Dell G15">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Responsável</label>
-                                <select th:field="*{responsavel}" class="form-select">
-                                    <option value="">-- Estoque / Sem Dono --</option>
-                                    <option th:each="func : ${listaFuncionarios}" 
-                                            th:value="${func.id}" 
-                                            th:text="${func.nome} + ' - ' + ${func.departamento}">
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Status</label>
-                                <select th:field="*{status}" class="form-select">
-                                    <option value="DISPONIVEL">Disponível</option>
-                                    <option value="EM_USO">Em Uso</option>
-                                    <option value="MANUTENCAO">Manutenção</option>
-                                    <option value="DESCARTE">Descarte</option>
-                                </select>
-                            </div>
-                            
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn" th:classappend="${novoAtivo.id != null} ? 'btn-warning' : 'btn-rei'">
-                                    <span th:text="${novoAtivo.id != null} ? 'Atualizar Dados' : 'Salvar Ativo'"></span>
-                                </button>
-                                <a th:if="${novoAtivo.id != null}" href="/ativos" class="btn btn-outline-secondary btn-sm">Cancelar</a>
-                            </div>
-                        </form>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">Patrimônio (Tag)</label>
+                            <input type="text" th:field="*{patrimonio}" class="form-control" placeholder="Ex: RM-001" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">Tipo de Equipamento</label>
+                            <select th:field="*{tipo}" class="form-select">
+                                <option value="Notebook">Notebook</option>
+                                <option value="Desktop">Desktop</option>
+                                <option value="Monitor">Monitor</option>
+                                <option value="Celular">Celular Corporativo</option>
+                                <option value="Impressora">Impressora</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">Modelo / Descrição</label>
+                            <input type="text" th:field="*{modelo}" class="form-control" placeholder="Ex: Dell G15 i7 16GB">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">Responsável Atual</label>
+                            <select th:field="*{responsavel}" class="form-select">
+                                <option value="">-- Em Estoque (Sem Dono) --</option>
+                                <option th:each="func : ${listaFuncionarios}" 
+                                        th:value="${func.id}" 
+                                        th:text="${func.nome} + ' - ' + ${func.departamento}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-bold">Status Atual</label>
+                            <select th:field="*{status}" class="form-select">
+                                <option value="DISPONIVEL">Disponível</option>
+                                <option value="EM_USO">Em Uso</option>
+                                <option value="MANUTENCAO">Manutenção</option>
+                                <option value="DESCARTE">Descarte</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger fw-bold py-2">
+                                <span th:text="${novoAtivo.id != null} ? 'Salvar Alterações' : 'Cadastrar Ativo'"></span>
+                            </button>
+                            <a th:if="${novoAtivo.id != null}" href="/ativos" class="btn btn-outline-secondary btn-sm">Cancelar Edição</a>
+                        </div>
+                    </form>
                 </div>
             </div>
 
             <div class="col-lg-8">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-white fw-bold py-3 d-flex justify-content-between align-items-center border-bottom">
-                        <span><i class="bi bi-list-ul text-rei"></i> Inventário</span>
-                        <input type="text" id="searchInput" class="form-control form-control-sm w-50" placeholder="Pesquisar...">
+                <div class="saas-card p-0 overflow-hidden">
+                    <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-secondary"><i class="bi bi-list-ul"></i> Lista de Inventário</span>
+                        <input type="text" id="searchInput" class="form-control form-control-sm w-50" placeholder="Pesquisar patrimônio, modelo...">
                     </div>
-                    <div class="card-body p-0">
+                    
+                    <div class="table-responsive">
                         <table class="table table-hover mb-0 align-middle">
-                            <thead class="table-light">
+                            <thead>
                                 <tr>
-                                    <th>Patrimônio</th>
+                                    <th class="ps-4">Patrimônio</th>
                                     <th>Equipamento</th>
                                     <th>Responsável</th>
                                     <th>Status</th>
-                                    <th class="text-end">Ações</th>
+                                    <th class="text-end pe-4">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:each="ativo : ${listaAtivos}" th:classappend="${novoAtivo.id == ativo.id} ? 'table-warning' : ''">
-                                    <td class="fw-bold text-rei" th:text="${ativo.patrimonio}">RM-001</td>
+                                    <td class="ps-4 fw-bold text-danger" th:text="${ativo.patrimonio}"></td>
                                     <td>
                                         <div class="d-flex flex-column">
-                                            <span class="fw-bold" th:text="${ativo.tipo}">Notebook</span>
-                                            <span class="text-muted small" th:text="${ativo.modelo}">Dell G15</span>
+                                            <span class="fw-bold text-dark" th:text="${ativo.tipo}"></span>
+                                            <span class="text-muted small" th:text="${ativo.modelo}"></span>
                                         </div>
                                     </td>
                                     <td>
@@ -218,11 +234,12 @@
                                         <span class="badge rounded-pill bg-warning text-dark" th:if="${ativo.status == 'MANUTENCAO'}">MANUTENÇÃO</span>
                                         <span class="badge rounded-pill bg-danger" th:if="${ativo.status == 'DESCARTE'}">DESCARTE</span>
                                     </td>
-                                    <td class="text-end">
-                                        <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" th:data-bs-target="'#modalQR' + ${ativo.id}"><i class="bi bi-qr-code"></i></button>
-                                        <a th:href="@{/ativos/detalhes/{id}(id=${ativo.id})}" class="btn btn-sm btn-outline-secondary" title="Ver Detalhes"><i class="bi bi-eye"></i></a>
-                                        <a th:href="@{/ativos/editar/{id}(id=${ativo.id})}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil-square"></i></a>
-                                        <a th:href="@{/ativos/deletar/{id}(id=${ativo.id})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza?');"><i class="bi bi-trash"></i></a>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-light border" data-bs-toggle="modal" th:data-bs-target="'#modalQR' + ${ativo.id}" title="QR Code"><i class="bi bi-qr-code"></i></button>
+                                            <a th:href="@{/ativos/editar/{id}(id=${ativo.id})}" class="btn btn-sm btn-light border text-primary" title="Editar"><i class="bi bi-pencil-square"></i></a>
+                                            <a th:href="@{/ativos/deletar/{id}(id=${ativo.id})}" class="btn btn-sm btn-light border text-danger" onclick="return confirm('Tem certeza?');" title="Excluir"><i class="bi bi-trash"></i></a>
+                                        </div>
 
                                         <div class="modal fade" th:id="'modalQR' + ${ativo.id}" tabindex="-1">
                                             <div class="modal-dialog modal-sm">
@@ -250,7 +267,7 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script th:inline="javascript">
         // Filtro de Pesquisa
         document.getElementById('searchInput').addEventListener('keyup', function() {
             var value = this.value.toLowerCase();
@@ -259,9 +276,7 @@
             });
         });
 
-        // --- CONFIGURAÇÃO DOS GRÁFICOS ---
-        
-        // 1. Gráfico de Rosca (Status)
+        // Configuração dos Gráficos (Mantendo a lógica original mas ajustando cores)
         const ctxStatus = document.getElementById('statusChart');
         new Chart(ctxStatus, {
             type: 'doughnut',
@@ -269,25 +284,23 @@
                 labels: ['Disponível', 'Em Uso', 'Manutenção', 'Descarte'],
                 datasets: [{
                     data: [
-                        [[${qtdDisponivel}]], 
-                        [[${qtdEmUso}]], 
-                        [[${qtdManutencao}]], 
-                        [[${qtdDescarte}]]
+                        /*[[${qtdDisponivel}]]*/ 0, 
+                        /*[[${qtdEmUso}]]*/ 0, 
+                        /*[[${qtdManutencao}]]*/ 0, 
+                        /*[[${qtdDescarte}]]*/ 0
                     ],
                     backgroundColor: ['#198754', '#212529', '#ffc107', '#dc3545'],
-                    borderWidth: 1
+                    borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'right' }
-                }
+                plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } },
+                cutout: '70%'
             }
         });
 
-        // 2. Gráfico de Barras (Tipos)
         const ctxType = document.getElementById('typeChart');
         new Chart(ctxType, {
             type: 'bar',
@@ -296,23 +309,24 @@
                 datasets: [{
                     label: 'Quantidade',
                     data: [
-                        [[${qtdNotebook}]], 
-                        [[${qtdDesktop}]], 
-                        [[${qtdMonitor}]], 
-                        [[${qtdCelular}]],
-                        [[${qtdImpressora}]]
+                        /*[[${qtdNotebook}]]*/ 0, 
+                        /*[[${qtdDesktop}]]*/ 0, 
+                        /*[[${qtdMonitor}]]*/ 0, 
+                        /*[[${qtdCelular}]]*/ 0,
+                        /*[[${qtdImpressora}]]*/ 0
                     ],
-                    backgroundColor: '#d90429', // Vermelho Rei
-                    borderColor: '#b00320',
-                    borderWidth: 1
+                    backgroundColor: '#d90429',
+                    borderRadius: 4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                }
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
             }
         });
     </script>
