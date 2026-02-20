@@ -17,7 +17,8 @@ public class ConfiguracaoController {
 
     @GetMapping("/configuracoes")
     public String abrirConfiguracoes(Model model) {
-        // Busca a configuração ID 1. Se não existir, cria uma nova em memória para não dar erro.
+        // Busca a configuração ID 1. Se não existir, cria uma nova em memória para não
+        // dar erro.
         Configuracao config = repository.findById(1L).orElse(new Configuracao());
         model.addAttribute("config", config);
         return "configuracoes";

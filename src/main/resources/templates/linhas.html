@@ -1,55 +1,162 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Linhas Móveis | ITAM</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
-    <style th:inline="css">
+
+    <style>
         :root {
             --sidebar-width: 260px;
-            --primary-color: [[${globalConfig.corPrimaria != null ? globalConfig.corPrimaria : '#d90429'}]];
+
+            --primary-color: #4f46e5;
             --dark-bg: #111827;
             --light-bg: #f3f4f6;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --text-color: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; }
-        .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg); position: fixed; top: 0; left: 0; padding: 20px; display: flex; flex-direction: column; }
-        .brand { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: #9ca3af; text-decoration: none; border-radius: 8px; margin-bottom: 2px; transition: all 0.2s; font-weight: 500; font-size: 0.9rem; }
-        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
-        .nav-link.active { background-color: var(--primary-color); color: white; }
-        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
-        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
-        .saas-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; }
-        .btn-custom { background-color: var(--primary-color); color: white; border: none; font-weight: bold; }
-        .btn-custom:hover { opacity: 0.9; color: white; }
+
+        body.dark-mode {
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--dark-bg);
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #9ca3af;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .menu-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            padding-left: 10px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .saas-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: none;
+        }
+
+        .btn-custom {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        .btn-custom:hover {
+            opacity: 0.9;
+            color: white;
+        }
     </style>
 </head>
-<body>
+
+<body th:classappend="${globalConfig.temaEscuro ? 'dark-mode' : ''}"
+    th:style="'--primary-color:' + ${globalConfig.corPrimaria}">
 
     <div class="sidebar">
         <a href="/" class="brand"><i class="bi bi-cpu-fill" style="color: var(--primary-color);"></i> ITAM</a>
         <nav>
             <div class="menu-label">Principal</div>
-            <a href="/" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Painel</a>
+            <a href="/" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Painel de Controle</a>
             <div class="menu-label">Inventário</div>
-            <a href="/ativos" class="nav-link"><i class="bi bi-pc-display"></i> Ativos</a> 
+            <a href="/ativos" class="nav-link"><i class="bi bi-pc-display"></i> Ativos de TI</a>
             <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
             <a href="/linhas" class="nav-link active"><i class="bi bi-phone-fill"></i> Telefonia</a>
-            <div class="menu-label">Pessoas</div>
+            <div class="menu-label">Pessoas &amp; Acesso</div>
             <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
-            <div class="menu-label">Sistema</div>
+            <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
+            <div class="menu-label">Gestão</div>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças &amp; Soft</a>
+            <a href="/compras" class="nav-link"><i class="bi bi-cart-fill"></i> Compras</a>
+            <a href="/manutencoes" class="nav-link"><i class="bi bi-tools"></i> Manutenções</a>
+            <a href="/transferencias" class="nav-link"><i class="bi bi-arrow-left-right"></i> Transferências</a>
             <a href="/configuracoes" class="nav-link"><i class="bi bi-gear-fill"></i> Configurações</a>
         </nav>
-        <div class="mt-auto"><form th:action="@{/logout}" method="post"><button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button></form></div>
+        <div class="mt-auto">
+            <form th:action="@{/logout}" method="post"><button
+                    class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i
+                        class="bi bi-box-arrow-left"></i> Sair</button></form>
+        </div>
     </div>
 
     <div class="main-content">
-        <div th:if="${mensagem}" class="alert alert-success alert-dismissible fade show"><span th:text="${mensagem}"></span><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-        <div th:if="${erro}" class="alert alert-danger alert-dismissible fade show"><span th:text="${erro}"></span><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+        <div th:if="${mensagem}" class="alert alert-success alert-dismissible fade show"><span
+                th:text="${mensagem}"></span><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${erro}" class="alert alert-danger alert-dismissible fade show"><span
+                th:text="${erro}"></span><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
 
         <h3 class="fw-bold mb-1 text-dark">Linhas Móveis</h3>
         <p class="text-muted mb-4">Controle de chips corporativos e recargas.</p>
@@ -58,18 +165,19 @@
             <div class="col-md-4">
                 <div class="saas-card" th:classappend="${novaLinha.id != null} ? 'border border-warning' : ''">
                     <h5 class="fw-bold mb-3">
-                        <i class="bi bi-sim-fill text-danger"></i> 
+                        <i class="bi bi-sim-fill text-danger"></i>
                         <span th:text="${novaLinha.id != null} ? 'Editar Linha' : 'Nova Linha'"></span>
                     </h5>
-                    
+
                     <form th:action="@{/linhas/salvar}" th:object="${novaLinha}" method="post">
                         <input type="hidden" th:field="*{id}" />
 
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">Número</label>
-                            <input type="text" th:field="*{numero}" class="form-control" placeholder="(00) 90000-0000" required>
+                            <input type="text" th:field="*{numero}" class="form-control" placeholder="(00) 90000-0000"
+                                required>
                         </div>
-                        
+
                         <div class="row g-2 mb-3">
                             <div class="col-6">
                                 <label class="form-label small fw-bold text-muted">Operadora</label>
@@ -91,7 +199,8 @@
 
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">Vencimento / Recarga</label>
-                            <input type="text" th:field="*{vencimento}" class="form-control" placeholder="Dia 28 ou 01/03">
+                            <input type="text" th:field="*{vencimento}" class="form-control"
+                                placeholder="Dia 28 ou 01/03">
                         </div>
 
                         <div class="mb-4">
@@ -106,7 +215,8 @@
                             <button type="submit" class="btn btn-dark fw-bold">
                                 <span th:text="${novaLinha.id != null} ? 'Salvar Alterações' : 'Salvar Linha'"></span>
                             </button>
-                            <a th:if="${novaLinha.id != null}" href="/linhas" class="btn btn-outline-secondary btn-sm">Cancelar</a>
+                            <a th:if="${novaLinha.id != null}" href="/linhas"
+                                class="btn btn-outline-secondary btn-sm">Cancelar</a>
                         </div>
                     </form>
                 </div>
@@ -127,24 +237,31 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="linha : ${linhas}" th:classappend="${novaLinha.id == linha.id} ? 'table-warning' : ''">
+                                <tr th:each="linha : ${linhas}"
+                                    th:classappend="${novaLinha.id == linha.id} ? 'table-warning' : ''">
                                     <td class="ps-4">
                                         <div class="fw-bold text-dark" th:text="${linha.numero}"></div>
                                         <small class="text-muted" th:text="${linha.operadora}"></small>
                                     </td>
                                     <td><span class="badge border text-dark" th:text="${linha.tipo}"></span></td>
                                     <td>
-                                        <span th:if="${linha.responsavel != null}" th:text="${linha.responsavel.nome}" class="fw-bold text-secondary"></span>
-                                        <span th:if="${linha.responsavel == null}" class="badge bg-light text-muted">Livre</span>
+                                        <span th:if="${linha.responsavel != null}" th:text="${linha.responsavel.nome}"
+                                            class="fw-bold text-secondary"></span>
+                                        <span th:if="${linha.responsavel == null}"
+                                            class="badge bg-light text-muted">Livre</span>
                                     </td>
                                     <td class="text-muted small">
-                                        <i class="bi bi-calendar-event me-1"></i> <span th:text="${linha.tipo == 'Pós-Pago' ? 'Dia Venc: ' : 'Expira: '} + ${linha.vencimento}"></span>
+                                        <i class="bi bi-calendar-event me-1"></i> <span
+                                            th:text="${linha.tipo == 'Pós-Pago' ? 'Dia Venc: ' : 'Expira: '} + ${linha.vencimento}"></span>
                                     </td>
                                     <td class="text-end pe-4">
-                                        <a th:href="@{/linhas/editar/{id}(id=${linha.id})}" class="btn btn-sm btn-light text-primary border me-1" title="Editar">
+                                        <a th:href="@{/linhas/editar/{id}(id=${linha.id})}"
+                                            class="btn btn-sm btn-light text-primary border me-1" title="Editar">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <a th:href="@{/linhas/deletar/{id}(id=${linha.id})}" class="btn btn-sm btn-light text-danger border" onclick="return confirm('Excluir linha?')" title="Excluir">
+                                        <a th:href="@{/linhas/deletar/{id}(id=${linha.id})}"
+                                            class="btn btn-sm btn-light text-danger border"
+                                            onclick="return confirm('Excluir linha?')" title="Excluir">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </td>
@@ -156,7 +273,8 @@
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

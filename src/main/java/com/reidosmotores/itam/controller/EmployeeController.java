@@ -25,6 +25,15 @@ public class EmployeeController {
         return "funcionarios";
     }
 
+    @GetMapping("/editar/{id}")
+    public String editarFuncionario(@PathVariable Long id, Model model) {
+        Employee employee = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado"));
+        model.addAttribute("novoFuncionario", employee);
+        model.addAttribute("listaFuncionarios", repository.findAll());
+        return "funcionarios";
+    }
+
     @PostMapping("/salvar")
     public String salvarFuncionario(Employee employee) {
         repository.save(employee);
@@ -37,7 +46,7 @@ public class EmployeeController {
         try {
             repository.deleteById(id);
         } catch (Exception e) {
-            // Se der erro (ex: funcionário tem notebook vinculado), 
+            // Se der erro (ex: funcionário tem notebook vinculado),
             // apenas ignora e volta pra lista por enquanto.
             System.out.println("Erro ao excluir: O funcionário possui vínculos.");
         }

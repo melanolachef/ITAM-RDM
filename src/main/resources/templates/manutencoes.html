@@ -1,31 +1,122 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <title>Manutenções | ITAM SaaS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style th:inline="css">  :root {
-        --sidebar-width: 260px;
-        --primary-color: [[${globalConfig.corPrimaria}]]; /* Cor Dinâmica */
+    <style>
+        :root {
+            --sidebar-width: 260px;
+
+            --primary-color: #4f46e5;
             --dark-bg: #111827;
             --light-bg: #f3f4f6;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-bg: #ffffff;
+            --text-color: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; overflow-x: hidden; }
-        .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg); color: #9ca3af; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; z-index: 1000; }
-        .brand { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: #d1d5db; text-decoration: none; border-radius: 8px; margin-bottom: 2px; transition: all 0.2s; font-weight: 500; font-size: 0.9rem; }
-        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
-        .nav-link.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4); }
-        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
-        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
-        .saas-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; }
-        .table-hover tbody tr:hover { background-color: #f9fafb; }
+
+        body.dark-mode {
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--dark-bg);
+            color: #9ca3af;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .brand {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #d1d5db;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4);
+        }
+
+        .menu-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            padding-left: 10px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .saas-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: none;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--card-bg);
+        }
     </style>
 </head>
-<body>
+
+<body th:classappend="${globalConfig.temaEscuro ? 'dark-mode' : ''}" th:style="'--primary-color:' + ${globalConfig.corPrimaria}">
 
     <div class="sidebar">
         <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
@@ -36,39 +127,54 @@
             <a href="/ativos" class="nav-link"><i class="bi bi-pc-display"></i> Ativos de TI</a>
             <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
             <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
-            <div class="menu-label">Pessoas & Acesso</div>
+            <div class="menu-label">Pessoas &amp; Acesso</div>
             <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
             <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
             <div class="menu-label">Gestão</div>
-            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças & Soft</a>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças &amp; Soft</a>
             <a href="/compras" class="nav-link"><i class="bi bi-cart-fill"></i> Compras</a>
-            <a href="/manutencoes" class="nav-link active"><i class="bi bi-tools"></i> Manutenções</a> </nav>
+            <a href="/manutencoes" class="nav-link active"><i class="bi bi-tools"></i> Manutenções</a>
+            <a href="/transferencias" class="nav-link"><i class="bi bi-arrow-left-right"></i> Transferências</a>
+            <a href="/configuracoes" class="nav-link"><i class="bi bi-gear-fill"></i> Configurações</a>
+        </nav>
         <div class="mt-auto">
-            <form th:action="@{/logout}" method="post"><button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button></form>
+            <form th:action="@{/logout}" method="post"><button
+                    class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i
+                        class="bi bi-box-arrow-left"></i> Sair</button></form>
         </div>
     </div>
 
     <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <div><h2 class="fw-bold m-0 text-dark">Manutenções</h2><p class="text-muted m-0">Histórico de consertos e serviços externos.</p></div>
+            <div>
+                <h2 class="fw-bold m-0 text-dark">Manutenções</h2>
+                <p class="text-muted m-0">Histórico de consertos e serviços externos.</p>
+            </div>
         </div>
 
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="saas-card">
-                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-wrench-adjustable text-danger me-2"></i>Novo Registro</h5>
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-wrench-adjustable text-danger me-2"></i>Novo
+                        Registro</h5>
                     <form th:action="@{/manutencoes/salvar}" th:object="${novaManutencao}" method="post">
                         <input type="hidden" th:field="*{id}">
                         <div class="mb-3"><label class="small text-muted fw-bold">Ativo</label>
                             <select th:field="*{asset}" class="form-select" required>
-                                <option th:each="a : ${listaAtivos}" th:value="${a.id}" th:text="${a.patrimonio} + ' - ' + ${a.modelo}"></option>
+                                <option th:each="a : ${listaAtivos}" th:value="${a.id}"
+                                    th:text="${a.patrimonio} + ' - ' + ${a.modelo}"></option>
                             </select>
                         </div>
-                        <div class="mb-3"><label class="small text-muted fw-bold">Descrição Serviço</label><input type="text" th:field="*{descricao}" class="form-control" required></div>
-                        <div class="mb-3"><label class="small text-muted fw-bold">Fornecedor</label><input type="text" th:field="*{fornecedor}" class="form-control" placeholder="Ex: Assistência Técnica"></div>
+                        <div class="mb-3"><label class="small text-muted fw-bold">Descrição Serviço</label><input
+                                type="text" th:field="*{descricao}" class="form-control" required></div>
+                        <div class="mb-3"><label class="small text-muted fw-bold">Fornecedor</label><input type="text"
+                                th:field="*{fornecedor}" class="form-control" placeholder="Ex: Assistência Técnica">
+                        </div>
                         <div class="row mb-4">
-                            <div class="col-6"><label class="small text-muted fw-bold">Data</label><input type="date" th:field="*{dataManutencao}" class="form-control" required></div>
-                            <div class="col-6"><label class="small text-muted fw-bold">Custo (R$)</label><input type="number" step="0.01" th:field="*{custo}" class="form-control"></div>
+                            <div class="col-6"><label class="small text-muted fw-bold">Data</label><input type="date"
+                                    th:field="*{dataManutencao}" class="form-control" required></div>
+                            <div class="col-6"><label class="small text-muted fw-bold">Custo (R$)</label><input
+                                    type="number" step="0.01" th:field="*{custo}" class="form-control"></div>
                         </div>
                         <button type="submit" class="btn btn-dark w-100 fw-bold">Salvar Serviço</button>
                     </form>
@@ -77,16 +183,29 @@
 
             <div class="col-md-8">
                 <div class="saas-card p-0 overflow-hidden">
-                    <div class="p-3 border-bottom bg-white"><span class="fw-bold text-secondary">Histórico de Serviços</span></div>
+                    <div class="p-3 border-bottom bg-white"><span class="fw-bold text-secondary">Histórico de
+                            Serviços</span></div>
                     <div class="table-responsive">
                         <table class="table mb-0 align-middle table-hover">
-                            <thead class="bg-light text-muted small"><tr><th class="ps-4">Ativo</th><th>Serviço</th><th>Custo</th><th class="text-end pe-4">Ação</th></tr></thead>
+                            <thead class="bg-light text-muted small">
+                                <tr>
+                                    <th class="ps-4">Ativo</th>
+                                    <th>Serviço</th>
+                                    <th>Custo</th>
+                                    <th class="text-end pe-4">Ação</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 <tr th:each="m : ${listaManutencoes}">
-                                    <td class="ps-4"><strong class="text-danger" th:text="${m.asset.patrimonio}"></strong><br><small th:text="${#temporals.format(m.dataManutencao, 'dd/MM/yyyy')}"></small></td>
-                                    <td><span th:text="${m.descricao}"></span><br><small class="text-muted" th:text="${m.fornecedor}"></small></td>
+                                    <td class="ps-4"><strong class="text-danger"
+                                            th:text="${m.asset.patrimonio}"></strong><br><small
+                                            th:text="${#temporals.format(m.dataManutencao, 'dd/MM/yyyy')}"></small></td>
+                                    <td><span th:text="${m.descricao}"></span><br><small class="text-muted"
+                                            th:text="${m.fornecedor}"></small></td>
                                     <td class="fw-bold text-dark">R$ <span th:text="${m.custo}"></span></td>
-                                    <td class="text-end pe-4"><a th:href="@{/manutencoes/deletar/{id}(id=${m.id})}" class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></a></td>
+                                    <td class="text-end pe-4"><a th:href="@{/manutencoes/deletar/{id}(id=${m.id})}"
+                                            class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -96,4 +215,5 @@
         </div>
     </div>
 </body>
+
 </html>

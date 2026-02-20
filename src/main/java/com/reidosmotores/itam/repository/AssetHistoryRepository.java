@@ -7,6 +7,10 @@ import java.util.List;
 
 @Repository
 public interface AssetHistoryRepository extends JpaRepository<AssetHistory, Long> {
-    // Busca o histórico de um ativo específico, ordenando do mais novo para o mais antigo
+    // Busca o histórico de um ativo específico, ordenando do mais novo para o mais
+    // antigo
     List<AssetHistory> findByAssetIdOrderByDataEventoDesc(Long assetId);
+
+    // Busca as últimas transferências (para a página de transferências)
+    List<AssetHistory> findTop20ByDescricaoStartingWithOrderByDataEventoDesc(String prefix);
 }

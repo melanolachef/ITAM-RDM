@@ -23,7 +23,7 @@ public class SoftwareLicense {
 
     private String nomeSoftware; // Ex: Office 365 Business
     private String chaveAtivacao; // Ex: XXXX-YYYY-ZZZZ
-    
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataExpiracao;
 
@@ -31,9 +31,12 @@ public class SoftwareLicense {
     @JoinColumn(name = "colaborador_id")
     private Employee colaborador; // Quem está usando a licença (Opcional)
 
+    private String setorResponsavel; // Ex: TI, Financeiro, RH
+
     // Verifica se vence nos próximos 30 dias
     public boolean isVencendo() {
-        if (dataExpiracao == null) return false;
+        if (dataExpiracao == null)
+            return false;
         LocalDate hoje = LocalDate.now();
         return !hoje.isAfter(dataExpiracao) && hoje.plusDays(30).isAfter(dataExpiracao);
     }

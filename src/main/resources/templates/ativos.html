@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <title>Ativos de TI | ITAM SaaS</title>
@@ -8,78 +9,187 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style th:inline="css">  :root {
-        --sidebar-width: 260px;
-        --primary-color: [[${globalConfig.corPrimaria}]]; /* Cor Dinâmica */
+    <style>
+        :root {
+            --sidebar-width: 260px;
+
+            --primary-color: #4f46e5;
             --dark-bg: #111827;
             --light-bg: #f3f4f6;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-bg: #ffffff;
+            --text-color: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; overflow-x: hidden; }
+        body.dark-mode {
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            overflow-x: hidden;
+        }
 
         /* SIDEBAR (Igual ao Dashboard) */
         .sidebar {
-            width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg);
-            color: #9ca3af; position: fixed; top: 0; left: 0;
-            display: flex; flex-direction: column; padding: 20px; z-index: 1000;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--dark-bg);
+            color: #9ca3af;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 1000;
         }
-        .brand { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+
+        .brand {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .nav-link {
-            display: flex; align-items: center; gap: 12px; padding: 10px 16px;
-            color: #d1d5db; text-decoration: none; border-radius: 8px; margin-bottom: 2px;
-            transition: all 0.2s; font-weight: 500; font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #d1d5db;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
         }
-        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
-        .nav-link.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4); }
-        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4);
+        }
+
+        .menu-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            padding-left: 10px;
+        }
 
         /* MAIN CONTENT */
-        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
 
         /* CARDS & TABLES */
-        .saas-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; height: 100%; }
-        .card-header-clean { background: white; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 20px; font-weight: 700; color: #374151; font-size: 1.1rem; }
-        
-        .kpi-value { font-size: 2rem; font-weight: 800; color: #111827; }
-        .kpi-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: #6b7280; }
+        .saas-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: none;
+            height: 100%;
+        }
 
-        .table thead th { background-color: #f9fafb; font-size: 0.75rem; text-transform: uppercase; color: #6b7280; font-weight: 700; border-bottom: 1px solid #e5e7eb; }
-        .table-hover tbody tr:hover { background-color: #f9fafb; }
+        .card-header-clean {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: #374151;
+            font-size: 1.1rem;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+
+        .kpi-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .table thead th {
+            background-color: var(--card-bg);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--card-bg);
+        }
     </style>
 </head>
-<body>
+
+<body th:classappend="${globalConfig.temaEscuro ? 'dark-mode' : ''}" th:style="'--primary-color:' + ${globalConfig.corPrimaria}">
 
     <div class="sidebar">
         <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
-        
+
         <nav>
             <div class="menu-label">Principal</div>
             <a href="/" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Painel de Controle</a>
-            
+
             <div class="menu-label">Inventário</div>
-            <a href="/ativos" class="nav-link active"><i class="bi bi-pc-display"></i> Ativos de TI</a> <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
+            <a href="/ativos" class="nav-link active"><i class="bi bi-pc-display"></i> Ativos de TI</a>
+            <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
             <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
 
-            <div class="menu-label">Pessoas & Acesso</div>
+            <div class="menu-label">Pessoas &amp; Acesso</div>
             <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
             <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
 
             <div class="menu-label">Gestão</div>
-            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças & Soft</a>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças &amp; Soft</a>
             <a href="/compras" class="nav-link"><i class="bi bi-cart-fill"></i> Compras</a>
             <a href="/manutencoes" class="nav-link"><i class="bi bi-tools"></i> Manutenções</a>
+            <a href="/transferencias" class="nav-link"><i class="bi bi-arrow-left-right"></i> Transferências</a>
+            <a href="/configuracoes" class="nav-link"><i class="bi bi-gear-fill"></i> Configurações</a>
         </nav>
 
         <div class="mt-auto">
             <form th:action="@{/logout}" method="post">
-                <button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button>
+                <button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i
+                        class="bi bi-box-arrow-left"></i> Sair</button>
             </form>
         </div>
     </div>
 
     <div class="main-content">
-        
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold m-0 text-dark">Ativos de TI</h2>
@@ -133,22 +243,25 @@
         </div>
 
         <div class="row g-4">
-            
+
             <div class="col-lg-4">
                 <div class="saas-card" th:classappend="${novoAtivo.id != null} ? 'border border-warning' : ''">
                     <div class="card-header-clean">
-                        <span th:if="${novoAtivo.id == null}"><i class="bi bi-plus-circle text-danger"></i> Novo Cadastro</span>
-                        <span th:if="${novoAtivo.id != null}" class="text-warning"><i class="bi bi-pencil-square"></i> Editando Ativo</span>
+                        <span th:if="${novoAtivo.id == null}"><i class="bi bi-plus-circle text-danger"></i> Novo
+                            Cadastro</span>
+                        <span th:if="${novoAtivo.id != null}" class="text-warning"><i class="bi bi-pencil-square"></i>
+                            Editando Ativo</span>
                     </div>
-                    
+
                     <form action="#" th:action="@{/ativos/salvar}" th:object="${novoAtivo}" method="post">
                         <input type="hidden" th:field="*{id}" />
 
                         <div class="mb-3">
                             <label class="form-label text-muted small fw-bold">Patrimônio (Tag)</label>
-                            <input type="text" th:field="*{patrimonio}" class="form-control" placeholder="Ex: RM-001" required>
+                            <input type="text" th:field="*{patrimonio}" class="form-control" placeholder="Ex: RM-001"
+                                required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label text-muted small fw-bold">Tipo de Equipamento</label>
                             <select th:field="*{tipo}" class="form-select">
@@ -163,16 +276,16 @@
 
                         <div class="mb-3">
                             <label class="form-label text-muted small fw-bold">Modelo / Descrição</label>
-                            <input type="text" th:field="*{modelo}" class="form-control" placeholder="Ex: Dell G15 i7 16GB">
+                            <input type="text" th:field="*{modelo}" class="form-control"
+                                placeholder="Ex: Dell G15 i7 16GB">
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label text-muted small fw-bold">Responsável Atual</label>
                             <select th:field="*{responsavel}" class="form-select">
                                 <option value="">-- Em Estoque (Sem Dono) --</option>
-                                <option th:each="func : ${listaFuncionarios}" 
-                                        th:value="${func.id}" 
-                                        th:text="${func.nome} + ' - ' + ${func.departamento}">
+                                <option th:each="func : ${listaFuncionarios}" th:value="${func.id}"
+                                    th:text="${func.nome} + ' - ' + ${func.departamento}">
                                 </option>
                             </select>
                         </div>
@@ -186,12 +299,14 @@
                                 <option value="DESCARTE">Descarte</option>
                             </select>
                         </div>
-                        
+
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-danger fw-bold py-2">
-                                <span th:text="${novoAtivo.id != null} ? 'Salvar Alterações' : 'Cadastrar Ativo'"></span>
+                                <span
+                                    th:text="${novoAtivo.id != null} ? 'Salvar Alterações' : 'Cadastrar Ativo'"></span>
                             </button>
-                            <a th:if="${novoAtivo.id != null}" href="/ativos" class="btn btn-outline-secondary btn-sm">Cancelar Edição</a>
+                            <a th:if="${novoAtivo.id != null}" href="/ativos"
+                                class="btn btn-outline-secondary btn-sm">Cancelar Edição</a>
                         </div>
                     </form>
                 </div>
@@ -201,9 +316,10 @@
                 <div class="saas-card p-0 overflow-hidden">
                     <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
                         <span class="fw-bold text-secondary"><i class="bi bi-list-ul"></i> Lista de Inventário</span>
-                        <input type="text" id="searchInput" class="form-control form-control-sm w-50" placeholder="Pesquisar patrimônio, modelo...">
+                        <input type="text" id="searchInput" class="form-control form-control-sm w-50"
+                            placeholder="Pesquisar patrimônio, modelo...">
                     </div>
-                    
+
                     <div class="table-responsive">
                         <table class="table table-hover mb-0 align-middle">
                             <thead>
@@ -216,7 +332,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="ativo : ${listaAtivos}" th:classappend="${novoAtivo.id == ativo.id} ? 'table-warning' : ''">
+                                <tr th:each="ativo : ${listaAtivos}"
+                                    th:classappend="${novoAtivo.id == ativo.id} ? 'table-warning' : ''">
                                     <td class="ps-4 fw-bold text-danger" th:text="${ativo.patrimonio}"></td>
                                     <td>
                                         <div class="d-flex flex-column">
@@ -225,20 +342,33 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <span th:if="${ativo.responsavel != null}" th:text="${ativo.responsavel.nome}" class="fw-bold text-dark"></span>
-                                        <span th:if="${ativo.responsavel == null}" class="badge bg-light text-muted border">Estoque</span>
+                                        <span th:if="${ativo.responsavel != null}" th:text="${ativo.responsavel.nome}"
+                                            class="fw-bold text-dark"></span>
+                                        <span th:if="${ativo.responsavel == null}"
+                                            class="badge bg-light text-muted border">Estoque</span>
                                     </td>
                                     <td>
-                                        <span class="badge rounded-pill bg-success" th:if="${ativo.status == 'DISPONIVEL'}">DISPONÍVEL</span>
-                                        <span class="badge rounded-pill bg-dark" th:if="${ativo.status == 'EM_USO'}">EM USO</span>
-                                        <span class="badge rounded-pill bg-warning text-dark" th:if="${ativo.status == 'MANUTENCAO'}">MANUTENÇÃO</span>
-                                        <span class="badge rounded-pill bg-danger" th:if="${ativo.status == 'DESCARTE'}">DESCARTE</span>
+                                        <span class="badge rounded-pill bg-success"
+                                            th:if="${ativo.status == 'DISPONIVEL'}">DISPONÍVEL</span>
+                                        <span class="badge rounded-pill bg-dark" th:if="${ativo.status == 'EM_USO'}">EM
+                                            USO</span>
+                                        <span class="badge rounded-pill bg-warning text-dark"
+                                            th:if="${ativo.status == 'MANUTENCAO'}">MANUTENÇÃO</span>
+                                        <span class="badge rounded-pill bg-danger"
+                                            th:if="${ativo.status == 'DESCARTE'}">DESCARTE</span>
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-light border" data-bs-toggle="modal" th:data-bs-target="'#modalQR' + ${ativo.id}" title="QR Code"><i class="bi bi-qr-code"></i></button>
-                                            <a th:href="@{/ativos/editar/{id}(id=${ativo.id})}" class="btn btn-sm btn-light border text-primary" title="Editar"><i class="bi bi-pencil-square"></i></a>
-                                            <a th:href="@{/ativos/deletar/{id}(id=${ativo.id})}" class="btn btn-sm btn-light border text-danger" onclick="return confirm('Tem certeza?');" title="Excluir"><i class="bi bi-trash"></i></a>
+                                            <button type="button" class="btn btn-sm btn-light border"
+                                                data-bs-toggle="modal" th:data-bs-target="'#modalQR' + ${ativo.id}"
+                                                title="QR Code"><i class="bi bi-qr-code"></i></button>
+                                            <a th:href="@{/ativos/editar/{id}(id=${ativo.id})}"
+                                                class="btn btn-sm btn-light border text-primary" title="Editar"><i
+                                                    class="bi bi-pencil-square"></i></a>
+                                            <a th:href="@{/ativos/deletar/{id}(id=${ativo.id})}"
+                                                class="btn btn-sm btn-light border text-danger"
+                                                onclick="return confirm('Tem certeza?');" title="Excluir"><i
+                                                    class="bi bi-trash"></i></a>
                                         </div>
 
                                         <div class="modal fade" th:id="'modalQR' + ${ativo.id}" tabindex="-1">
@@ -246,11 +376,14 @@
                                                 <div class="modal-content text-center">
                                                     <div class="modal-header bg-dark text-white">
                                                         <h5 class="modal-title">Etiqueta</h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                        <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <p class="fw-bold mb-1 display-6" th:text="${ativo.patrimonio}"></p>
-                                                        <img th:src="@{/ativos/qrcode/{id}(id=${ativo.id})}" class="img-fluid border p-2 mb-2" />
+                                                        <p class="fw-bold mb-1 display-6" th:text="${ativo.patrimonio}">
+                                                        </p>
+                                                        <img th:src="@{/ativos/qrcode/{id}(id=${ativo.id})}"
+                                                            class="img-fluid border p-2 mb-2" />
                                                         <p class="small text-muted">Rei dos Motores ITAM</p>
                                                     </div>
                                                 </div>
@@ -265,13 +398,13 @@
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:inline="javascript">
         // Filtro de Pesquisa
-        document.getElementById('searchInput').addEventListener('keyup', function() {
+        document.getElementById('searchInput').addEventListener('keyup', function () {
             var value = this.value.toLowerCase();
-            document.querySelectorAll('table tbody tr').forEach(function(row) {
+            document.querySelectorAll('table tbody tr').forEach(function (row) {
                 row.style.display = row.textContent.toLowerCase().indexOf(value) > -1 ? '' : 'none';
             });
         });
@@ -284,9 +417,9 @@
                 labels: ['Disponível', 'Em Uso', 'Manutenção', 'Descarte'],
                 datasets: [{
                     data: [
-                        /*[[${qtdDisponivel}]]*/ 0, 
-                        /*[[${qtdEmUso}]]*/ 0, 
-                        /*[[${qtdManutencao}]]*/ 0, 
+                        /*[[${qtdDisponivel}]]*/ 0,
+                        /*[[${qtdEmUso}]]*/ 0,
+                        /*[[${qtdManutencao}]]*/ 0,
                         /*[[${qtdDescarte}]]*/ 0
                     ],
                     backgroundColor: ['#198754', '#212529', '#ffc107', '#dc3545'],
@@ -309,9 +442,9 @@
                 datasets: [{
                     label: 'Quantidade',
                     data: [
-                        /*[[${qtdNotebook}]]*/ 0, 
-                        /*[[${qtdDesktop}]]*/ 0, 
-                        /*[[${qtdMonitor}]]*/ 0, 
+                        /*[[${qtdNotebook}]]*/ 0,
+                        /*[[${qtdDesktop}]]*/ 0,
+                        /*[[${qtdMonitor}]]*/ 0,
                         /*[[${qtdCelular}]]*/ 0,
                         /*[[${qtdImpressora}]]*/ 0
                     ],
@@ -331,4 +464,5 @@
         });
     </script>
 </body>
+
 </html>

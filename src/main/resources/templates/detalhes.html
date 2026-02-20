@@ -1,31 +1,119 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <title>Detalhes do Ativo | ITAM SaaS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
-    <style th:inline="css">  :root {
-        --sidebar-width: 260px;
-        --primary-color: [[${globalConfig.corPrimaria}]]; /* Cor Dinâmica */
+
+    <style>
+        :root {
+            --sidebar-width: 260px;
+
+            --primary-color: #4f46e5;
             --dark-bg: #111827;
             --light-bg: #f3f4f6;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-bg: #ffffff;
+            --text-color: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; overflow-x: hidden; }
-        .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg); color: #9ca3af; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; z-index: 1000; }
-        .brand { color: white; font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: #d1d5db; text-decoration: none; border-radius: 8px; margin-bottom: 2px; transition: all 0.2s; font-weight: 500; font-size: 0.9rem; }
-        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
-        .nav-link.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4); }
-        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
-        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
-        .saas-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; }
+
+        body.dark-mode {
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--dark-bg);
+            color: #9ca3af;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .brand {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #d1d5db;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4);
+        }
+
+        .menu-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            padding-left: 10px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .saas-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: none;
+        }
     </style>
 </head>
-<body>
+
+<body th:classappend="${globalConfig.temaEscuro ? 'dark-mode' : ''}" th:style="'--primary-color:' + ${globalConfig.corPrimaria}">
 
     <div class="sidebar">
         <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
@@ -36,22 +124,27 @@
             <a href="/ativos" class="nav-link active"><i class="bi bi-pc-display"></i> Ativos de TI</a>
             <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
             <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
-            <div class="menu-label">Pessoas & Acesso</div>
+            <div class="menu-label">Pessoas &amp; Acesso</div>
             <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
             <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
             <div class="menu-label">Gestão</div>
-            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças & Soft</a>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças &amp; Soft</a>
             <a href="/compras" class="nav-link"><i class="bi bi-cart-fill"></i> Compras</a>
             <a href="/manutencoes" class="nav-link"><i class="bi bi-tools"></i> Manutenções</a>
+            <a href="/transferencias" class="nav-link"><i class="bi bi-arrow-left-right"></i> Transferências</a>
+            <a href="/configuracoes" class="nav-link"><i class="bi bi-gear-fill"></i> Configurações</a>
         </nav>
         <div class="mt-auto">
-            <form th:action="@{/logout}" method="post"><button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button></form>
+            <form th:action="@{/logout}" method="post"><button
+                    class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i
+                        class="bi bi-box-arrow-left"></i> Sair</button></form>
         </div>
     </div>
 
     <div class="main-content">
         <div class="d-flex align-items-center gap-3 mb-4">
-            <a href="/ativos" class="btn btn-white border bg-white shadow-sm rounded-circle"><i class="bi bi-arrow-left"></i></a>
+            <a href="/ativos" class="btn btn-white border bg-white shadow-sm rounded-circle"><i
+                    class="bi bi-arrow-left"></i></a>
             <h2 class="fw-bold m-0 text-dark">Ficha Técnica</h2>
         </div>
 
@@ -64,23 +157,27 @@
                     <h1 class="text-danger fw-bold m-0" th:text="${ativo.patrimonio}">RM-001</h1>
                     <h5 th:text="${ativo.modelo}" class="fw-bold text-dark mt-2">Dell G15</h5>
                     <span class="badge bg-light text-dark border mt-1" th:text="${ativo.tipo}">Notebook</span>
-                    
+
                     <hr class="my-4 opacity-25">
-                    
+
                     <div class="text-start px-3">
                         <p class="text-muted mb-1 small fw-bold text-uppercase">Responsável</p>
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-person-circle fs-4 text-secondary"></i>
                             <div>
-                                <h6 th:if="${ativo.responsavel != null}" th:text="${ativo.responsavel.nome}" class="text-dark m-0 fw-bold">João</h6>
-                                <h6 th:if="${ativo.responsavel == null}" class="text-muted fst-italic m-0">Em Estoque</h6>
+                                <h6 th:if="${ativo.responsavel != null}" th:text="${ativo.responsavel.nome}"
+                                    class="text-dark m-0 fw-bold">João</h6>
+                                <h6 th:if="${ativo.responsavel == null}" class="text-muted fst-italic m-0">Em Estoque
+                                </h6>
                             </div>
                         </div>
 
                         <p class="text-muted mb-1 mt-4 small fw-bold text-uppercase">Status Atual</p>
-                        <span class="badge rounded-pill bg-success" th:if="${ativo.status == 'DISPONIVEL'}">DISPONÍVEL</span>
+                        <span class="badge rounded-pill bg-success"
+                            th:if="${ativo.status == 'DISPONIVEL'}">DISPONÍVEL</span>
                         <span class="badge rounded-pill bg-dark" th:if="${ativo.status == 'EM_USO'}">EM USO</span>
-                        <span class="badge rounded-pill bg-warning text-dark" th:if="${ativo.status == 'MANUTENCAO'}">MANUTENÇÃO</span>
+                        <span class="badge rounded-pill bg-warning text-dark"
+                            th:if="${ativo.status == 'MANUTENCAO'}">MANUTENÇÃO</span>
                         <span class="badge rounded-pill bg-danger" th:if="${ativo.status == 'DESCARTE'}">DESCARTE</span>
                     </div>
                 </div>
@@ -88,13 +185,15 @@
 
             <div class="col-md-8">
                 <div class="saas-card h-100">
-                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-clock-history text-danger me-2"></i> Histórico de Eventos</h5>
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-clock-history text-danger me-2"></i> Histórico de
+                        Eventos</h5>
                     <div class="list-group list-group-flush">
                         <div class="list-group-item border-0 ps-0" th:each="hist : ${historico}">
                             <div class="d-flex w-100 justify-content-between align-items-center">
                                 <div>
                                     <h6 class="mb-1 fw-bold text-dark" th:text="${hist.descricao}">Transferência</h6>
-                                    <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> <span th:text="${hist.dataFormatada}"></span></small>
+                                    <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> <span
+                                            th:text="${hist.dataFormatada}"></span></small>
                                 </div>
                                 <i class="bi bi-chevron-right text-muted small"></i>
                             </div>
@@ -111,4 +210,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

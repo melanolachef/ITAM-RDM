@@ -1,55 +1,373 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <title>Configurações | ITAM SaaS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
-    <style th:inline="css">
+
+    <style>
         :root {
             --sidebar-width: 260px;
-            --primary-color: [[${globalConfig.corPrimaria}]]; 
+
+            --primary-color: #4f46e5;
             --dark-bg: #111827;
             --light-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
             --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --input-bg: #ffffff;
+            --input-border: #d1d5db;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); margin: 0; overflow-x: hidden; }
-        .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--dark-bg); color: #9ca3af; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; z-index: 1000; }
-        
-        /* LOGO / BRAND */
-        .brand { 
-            color: white; 
-            font-size: 1.4rem; 
-            font-weight: 800; 
-            margin-bottom: 40px; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            text-decoration: none; 
+
+        body.dark-mode {
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --input-bg: #0f172a;
+            --input-border: #475569;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            margin: 0;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--dark-bg);
+            color: #9ca3af;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .brand {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
             letter-spacing: -0.5px;
         }
-        .brand:hover { color: white; opacity: 0.9; }
 
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: #d1d5db; text-decoration: none; border-radius: 8px; margin-bottom: 2px; transition: all 0.2s; font-weight: 500; font-size: 0.9rem; }
-        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
-        
-        .nav-link.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        
-        .menu-label { font-size: 0.7rem; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; padding-left: 10px; }
-        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
-        .saas-card { background: white; border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: none; }
+        .brand:hover {
+            color: white;
+            opacity: 0.9;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #d1d5db;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-label {
+            font-size: 0.7rem;
+            color: #6b7280;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            padding-left: 10px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px 40px;
+        }
+
+        /* Settings Cards */
+        .settings-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .settings-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-card-header .icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .settings-card-header h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-color);
+        }
+
+        .settings-card-header p {
+            margin: 2px 0 0;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        /* Form controls */
+        .form-control,
+        .form-select {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-color);
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color), 0.15);
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--text-color);
+            margin-bottom: 6px;
+        }
+
+        .form-text {
+            color: var(--text-muted) !important;
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle-wrapper:hover {
+            border-color: var(--primary-color);
+        }
+
+        .theme-toggle-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle-info .icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s;
+        }
+
+        .theme-switch {
+            position: relative;
+            width: 56px;
+            height: 30px;
+            flex-shrink: 0;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #cbd5e1;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .theme-slider::before {
+            content: '';
+            position: absolute;
+            height: 24px;
+            width: 24px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-switch input:checked+.theme-slider {
+            background-color: var(--primary-color);
+        }
+
+        .theme-switch input:checked+.theme-slider::before {
+            transform: translateX(26px);
+        }
+
+        /* Save Button */
+        .btn-save {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-save:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Preview components */
+        .preview-zone {
+            background: var(--input-bg);
+            border: 1px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .preview-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            background-color: var(--primary-color);
+        }
+
+        .preview-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            background-color: var(--primary-color);
+            border: none;
+            transition: transform 0.2s;
+        }
+
+        .preview-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .preview-card-mini {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .color-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            border: 3px solid var(--border-color);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h2 {
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            margin: 4px 0 0;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
-<body>
+
+<body th:classappend="${globalConfig.temaEscuro ? 'dark-mode' : ''}" th:style="'--primary-color:' + ${globalConfig.corPrimaria}">
 
     <div class="sidebar">
         <a href="/" class="brand">
-            <i class="bi bi-cpu-fill" style="color: var(--primary-color);"></i> 
+            <i class="bi bi-cpu-fill" style="color: var(--primary-color);"></i>
             <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
         </a>
-        
+
         <nav>
             <div class="menu-label">Principal</div>
             <a href="/" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Painel de Controle</a>
@@ -57,60 +375,217 @@
             <a href="/ativos" class="nav-link"><i class="bi bi-pc-display"></i> Ativos de TI</a>
             <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
             <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
-            <div class="menu-label">Sistema</div>
-            <a href="/configuracoes" class="nav-link active"><i class="bi bi-gear-fill"></i> Configurações</a> 
+            <div class="menu-label">Pessoas &amp; Acesso</div>
+            <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
+            <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
+            <div class="menu-label">Gestão</div>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças &amp; Soft</a>
+            <a href="/compras" class="nav-link"><i class="bi bi-cart-fill"></i> Compras</a>
+            <a href="/manutencoes" class="nav-link"><i class="bi bi-tools"></i> Manutenções</a>
+            <a href="/transferencias" class="nav-link"><i class="bi bi-arrow-left-right"></i> Transferências</a>
+            <a href="/configuracoes" class="nav-link active"><i class="bi bi-gear-fill"></i> Configurações</a>
         </nav>
-        
+
         <div class="mt-auto">
-            <form th:action="@{/logout}" method="post"><button class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i class="bi bi-box-arrow-left"></i> Sair</button></form>
+            <form th:action="@{/logout}" method="post"><button
+                    class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i
+                        class="bi bi-box-arrow-left"></i> Sair</button></form>
         </div>
     </div>
 
     <div class="main-content">
-        <h2 class="fw-bold m-0 text-dark mb-4">Personalização do Sistema</h2>
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="saas-card h-100">
-                    <form th:action="@{/configuracoes/salvar}" th:object="${config}" method="post">
-                        
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Nome da Empresa / Sistema</label>
-                            <input type="text" th:field="*{nomeEmpresa}" class="form-control form-control-lg" placeholder="Ex: Lucas Tech">
-                            <div class="form-text">Isso altera o título na barra lateral.</div>
-                        </div>
+        <div class="page-header">
+            <h2><i class="bi bi-gear-fill me-2" style="color: var(--primary-color);"></i>Configurações</h2>
+            <p>Personalize a aparência e identidade do seu sistema</p>
+        </div>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Cor Primária (Tema)</label>
-                            <div class="d-flex gap-3 align-items-center">
-                                <input type="color" th:field="*{corPrimaria}" class="form-control form-control-color" style="width: 80px; height: 50px;">
-                                <span class="text-muted small">Clique para escolher a cor dos botões e menus.</span>
+        <form th:action="@{/configuracoes/salvar}" th:object="${config}" method="post">
+
+            <div class="row">
+                <!-- Left Column -->
+                <div class="col-lg-7">
+
+                    <!-- Section 1: Identidade -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <div class="icon-box" style="background-color: rgba(59,130,246,0.1); color: #3b82f6;">
+                                <i class="bi bi-building"></i>
+                            </div>
+                            <div>
+                                <h5>Identidade do Sistema</h5>
+                                <p>Defina o nome e a cor que representam sua empresa</p>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn text-white w-100 fw-bold p-3 mt-3" style="background-color: var(--primary-color);">
-                            <i class="bi bi-save me-2"></i> Salvar Alterações
+                        <div class="mb-4">
+                            <label class="form-label">Nome da Empresa / Sistema</label>
+                            <input type="text" th:field="*{nomeEmpresa}" class="form-control form-control-lg"
+                                placeholder="Ex: Lucas Tech" id="inputNomeEmpresa">
+                            <div class="form-text">Aparece na barra lateral e no cabeçalho de todas as páginas</div>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Cor Primária (Tema)</label>
+                            <div class="d-flex gap-3 align-items-center">
+                                <input type="color" th:field="*{corPrimaria}" class="color-swatch"
+                                    id="inputCorPrimaria">
+                                <div>
+                                    <span class="fw-semibold" style="color: var(--text-color);" id="corHexLabel"
+                                        th:text="${config.corPrimaria}"></span>
+                                    <div class="form-text">Clique no quadrado para alterar a cor do sistema</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Aparência -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <div class="icon-box" style="background-color: rgba(139,92,246,0.1); color: #8b5cf6;">
+                                <i class="bi bi-palette-fill"></i>
+                            </div>
+                            <div>
+                                <h5>Aparência</h5>
+                                <p>Escolha o tema visual do sistema</p>
+                            </div>
+                        </div>
+
+                        <div class="theme-toggle-wrapper">
+                            <div class="theme-toggle-info">
+                                <div class="icon-wrapper" id="themeIcon"
+                                    th:style="${config.temaEscuro ? 'background-color: rgba(99,102,241,0.15); color: #818cf8;' : 'background-color: rgba(251,191,36,0.15); color: #f59e0b;'}">
+                                    <i th:class="${config.temaEscuro ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill'}"
+                                        id="themeIconI"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" style="color: var(--text-color);" id="themeLabel"
+                                        th:text="${config.temaEscuro ? 'Tema Escuro' : 'Tema Claro'}">Tema Claro</div>
+                                    <div class="form-text" id="themeDesc"
+                                        th:text="${config.temaEscuro ? 'Interface com cores escuras, ideal para ambientes com pouca luz' : 'Interface clara e luminosa, padrão do sistema'}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <label class="theme-switch">
+                                <input type="checkbox" id="darkModeToggle" th:checked="${config.temaEscuro}">
+                                <span class="theme-slider"></span>
+                            </label>
+
+                            <!-- Hidden field to submit the boolean value -->
+                            <input type="hidden" th:field="*{temaEscuro}" id="temaEscuroHidden">
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn-save">
+                            <i class="bi bi-check2-circle me-2"></i>Salvar Alterações
                         </button>
-                    </form>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Preview -->
+                <div class="col-lg-5">
+                    <div class="settings-card" style="position: sticky; top: 30px;">
+                        <div class="settings-card-header">
+                            <div class="icon-box" style="background-color: rgba(34,197,94,0.1); color: #22c55e;">
+                                <i class="bi bi-eye-fill"></i>
+                            </div>
+                            <div>
+                                <h5>Pré-visualização</h5>
+                                <p>Veja como suas escolhas refletem no sistema</p>
+                            </div>
+                        </div>
+
+                        <div class="preview-zone mb-3">
+                            <div class="mb-3">
+                                <small class="text-uppercase fw-bold"
+                                    style="color: var(--text-muted); font-size: 0.7rem;">Componentes</small>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="preview-badge">Aprovado</span>
+                                <span class="preview-badge" style="opacity: 0.7;">Pendente</span>
+                                <button class="preview-btn"><i class="bi bi-plus-lg"></i> Novo Item</button>
+                            </div>
+
+                            <div class="row g-2 mt-2">
+                                <div class="col-6">
+                                    <div class="preview-card-mini">
+                                        <i class="bi bi-pc-display-horizontal fs-4"
+                                            style="color: var(--primary-color);"></i>
+                                        <div class="fw-bold mt-1" style="font-size: 0.8rem; color: var(--text-color);">
+                                            Ativos</div>
+                                        <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-color);">48
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="preview-card-mini">
+                                        <i class="bi bi-people fs-4" style="color: var(--primary-color);"></i>
+                                        <div class="fw-bold mt-1" style="font-size: 0.8rem; color: var(--text-color);">
+                                            Usuários</div>
+                                        <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-color);">12
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <small style="color: var(--text-muted);"><i class="bi bi-info-circle me-1"></i>As alterações
+                                são aplicadas após salvar</small>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="saas-card bg-light text-center h-100 d-flex flex-column justify-content-center align-items-center border-0">
-                    <div class="p-4 rounded-circle bg-white shadow-sm mb-3">
-                        <i class="bi bi-palette fs-1" style="color: var(--primary-color);"></i>
-                    </div>
-                    <h5>Visualização em Tempo Real</h5>
-                    <p class="text-muted small w-75">Ao salvar, o sistema recarregará e aplicará a nova cor em todos os botões e menus ativos.</p>
-                    
-                    <div class="mt-3">
-                        <span class="badge rounded-pill px-3 py-2 text-white" style="background-color: var(--primary-color);">Exemplo de Badge</span>
-                        <button class="btn btn-sm text-white ms-2" style="background-color: var(--primary-color); border: none;">Exemplo Botão</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
 
+    <script>
+        // Dark mode toggle - updates hidden field and provides instant visual preview
+        const toggle = document.getElementById('darkModeToggle');
+        const hiddenField = document.getElementById('temaEscuroHidden');
+        const body = document.body;
+        const themeLabel = document.getElementById('themeLabel');
+        const themeDesc = document.getElementById('themeDesc');
+        const themeIconI = document.getElementById('themeIconI');
+        const themeIcon = document.getElementById('themeIcon');
+
+        // Sync on load
+        hiddenField.value = toggle.checked;
+
+        toggle.addEventListener('change', function () {
+            hiddenField.value = this.checked;
+
+            // Instant preview
+            if (this.checked) {
+                body.classList.add('dark-mode');
+                themeLabel.textContent = 'Tema Escuro';
+                themeDesc.textContent = 'Interface com cores escuras, ideal para ambientes com pouca luz';
+                themeIconI.className = 'bi bi-moon-stars-fill';
+                themeIcon.style.backgroundColor = 'rgba(99,102,241,0.15)';
+                themeIcon.style.color = '#818cf8';
+            } else {
+                body.classList.remove('dark-mode');
+                themeLabel.textContent = 'Tema Claro';
+                themeDesc.textContent = 'Interface clara e luminosa, padrão do sistema';
+                themeIconI.className = 'bi bi-sun-fill';
+                themeIcon.style.backgroundColor = 'rgba(251,191,36,0.15)';
+                themeIcon.style.color = '#f59e0b';
+            }
+        });
+
+        // Live color preview
+        document.getElementById('inputCorPrimaria').addEventListener('input', function (e) {
+            document.documentElement.style.setProperty('--primary-color', e.target.value);
+            document.getElementById('corHexLabel').textContent = e.target.value;
+        });
+    </script>
+
 </body>
+
 </html>
