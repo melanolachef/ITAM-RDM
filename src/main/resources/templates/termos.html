@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Termos de Uso | ITAM SaaS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary-color: #4f46e5;
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        body.dark-mode {
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--dark-bg);
+            color: #9ca3af;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .brand {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #d1d5db;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(217, 4, 41, 0.4);
+        }
+
+        .menu-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            padding-left: 10px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .saas-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: none;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--card-bg);
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .file-type-icon {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body th:classappend="${globalConfig.temaEscuro ? 'dark-mode' : ''}"
+    th:style="'--primary-color:' + ${globalConfig.corPrimaria}">
+
+    <div class="sidebar">
+        <span th:text="${globalConfig.nomeEmpresa}">ITAM SaaS</span>
+        <nav>
+            <div class="menu-label">Principal</div>
+            <a href="/" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Painel de Controle</a>
+            <div class="menu-label">Inventário</div>
+            <a href="/ativos" class="nav-link"><i class="bi bi-pc-display"></i> Ativos de TI</a>
+            <a href="/acessorios" class="nav-link"><i class="bi bi-mouse-fill"></i> Acessórios</a>
+            <a href="/linhas" class="nav-link"><i class="bi bi-phone-fill"></i> Telefonia</a>
+            <div class="menu-label">Pessoas &amp; Acesso</div>
+            <a href="/funcionarios" class="nav-link"><i class="bi bi-people-fill"></i> Colaboradores</a>
+            <a href="/usuarios" class="nav-link"><i class="bi bi-person-badge"></i> Usuários Sistema</a>
+            <div class="menu-label">Gestão</div>
+            <a href="/licencas" class="nav-link"><i class="bi bi-hdd-network"></i> Licenças &amp; Soft</a>
+            <a href="/compras" class="nav-link"><i class="bi bi-cart-fill"></i> Compras</a>
+            <a href="/manutencoes" class="nav-link"><i class="bi bi-tools"></i> Manutenções</a>
+            <a href="/termos" class="nav-link active"><i class="bi bi-file-earmark-text"></i> Termos de Uso</a>
+            <a href="/transferencias" class="nav-link"><i class="bi bi-arrow-left-right"></i> Transferências</a>
+            <a href="/configuracoes" class="nav-link"><i class="bi bi-gear-fill"></i> Configurações</a>
+        </nav>
+        <div class="mt-auto">
+            <form th:action="@{/logout}" method="post"><button
+                    class="nav-link bg-transparent border-0 w-100 text-start text-danger"><i
+                        class="bi bi-box-arrow-left"></i> Sair</button></form>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold m-0 text-dark">Termos de Uso</h2>
+                <p class="text-muted m-0">Documentos assinados pelos colaboradores ao receberem equipamentos.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Formulário de Upload -->
+            <div class="col-md-4">
+                <div class="saas-card">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-file-earmark-arrow-up text-danger me-2"></i>Novo
+                        Termo</h5>
+                    <form th:action="@{/termos/upload}" method="post" enctype="multipart/form-data" id="termoForm">
+
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold">Ativo</label>
+                            <select name="assetId" class="form-select" required>
+                                <option value="">-- Selecione o ativo --</option>
+                                <option th:each="a : ${listaAtivos}" th:value="${a.id}"
+                                    th:text="${a.patrimonio} + ' - ' + ${a.modelo}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold">Funcionário</label>
+                            <select name="funcionarioId" class="form-select" required>
+                                <option value="">-- Selecione o funcionário --</option>
+                                <option th:each="f : ${listaFuncionarios}" th:value="${f.id}"
+                                    th:text="${f.nome} + ' - ' + ${f.departamento}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold">Observação</label>
+                            <input type="text" name="observacao" class="form-control"
+                                placeholder="Ex: Termo de responsabilidade Notebook">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold">Documento (PDF ou Imagem)</label>
+                            <div class="upload-zone" onclick="document.getElementById('termoFileInput').click()">
+                                <i class="bi bi-cloud-arrow-up fs-4 text-muted"></i>
+                                <p class="small text-muted m-0 mt-1" id="fileLabel">Clique para selecionar arquivo</p>
+                                <input type="file" name="arquivo" id="termoFileInput" accept=".pdf,image/*"
+                                    style="display:none"
+                                    onchange="document.getElementById('fileLabel').textContent = this.files[0] ? this.files[0].name : 'Clique para selecionar arquivo'"
+                                    required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark w-100 fw-bold">
+                            <i class="bi bi-upload me-1"></i> Salvar Termo
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabela de Termos -->
+            <div class="col-md-8">
+                <div class="saas-card p-0 overflow-hidden">
+                    <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-secondary"><i class="bi bi-file-earmark-text me-1"></i> Documentos
+                            Cadastrados</span>
+                        <input type="text" id="searchInput" class="form-control form-control-sm w-50"
+                            placeholder="Pesquisar...">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table mb-0 align-middle table-hover">
+                            <thead class="bg-light text-muted small">
+                                <tr>
+                                    <th class="ps-4">Ativo</th>
+                                    <th>Funcionário</th>
+                                    <th>Documento</th>
+                                    <th>Data</th>
+                                    <th class="text-end pe-4">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="t : ${listaTermos}">
+                                    <td class="ps-4">
+                                        <strong class="text-danger" th:text="${t.asset.patrimonio}"></strong><br>
+                                        <small class="text-muted" th:text="${t.asset.modelo}"></small>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark" th:text="${t.funcionario.nome}"></span><br>
+                                        <small class="text-muted" th:text="${t.funcionario.departamento}"></small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i
+                                                th:class="${t.contentType != null and t.contentType.contains('pdf')} ? 'bi bi-file-earmark-pdf text-danger file-type-icon' : 'bi bi-file-earmark-image text-primary file-type-icon'"></i>
+                                            <div>
+                                                <span class="small fw-bold" th:text="${t.nomeArquivo}"></span>
+                                                <br th:if="${t.observacao != null and !t.observacao.isEmpty()}">
+                                                <small th:if="${t.observacao != null and !t.observacao.isEmpty()}"
+                                                    class="text-muted" th:text="${t.observacao}"></small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="small text-muted" th:text="${t.dataFormatada}"></td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group">
+                                            <a th:href="@{/termos/{id}/download(id=${t.id})}" target="_blank"
+                                                class="btn btn-sm btn-light border text-primary" title="Visualizar"><i
+                                                    class="bi bi-eye"></i></a>
+                                            <a th:href="@{/termos/{id}/deletar(id=${t.id})}"
+                                                class="btn btn-sm btn-light border text-danger"
+                                                onclick="return confirm('Excluir este termo?');" title="Excluir"><i
+                                                    class="bi bi-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center text-muted py-5" th:if="${#lists.isEmpty(listaTermos)}">
+                        <i class="bi bi-file-earmark-x fs-1 d-block mb-2 opacity-25"></i>
+                        Nenhum termo cadastrado ainda.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function () {
+            var value = this.value.toLowerCase();
+            document.querySelectorAll('table tbody tr').forEach(function (row) {
+                row.style.display = row.textContent.toLowerCase().indexOf(value) > -1 ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+
+</html>

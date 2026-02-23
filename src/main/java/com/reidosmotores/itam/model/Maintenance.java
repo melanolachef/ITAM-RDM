@@ -29,10 +29,21 @@ public class Maintenance {
 
     private String descricao; // Ex: Troca de Tela, Formatação
     private String fornecedor; // Ex: Assistência Técnica XYZ
-    
+
     @Column(precision = 10, scale = 2)
     private BigDecimal custo; // Quanto custou
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataManutencao;
+
+    // Rastreamento de troca de Capinha e Película
+    private Boolean trocouCapinha;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dataTrocaCapinha;
+
+    private Boolean trocouPelicula;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dataTrocaPelicula;
 }

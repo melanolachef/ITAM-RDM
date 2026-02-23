@@ -13,25 +13,40 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.reidosmotores.itam.model.Asset;
 import com.reidosmotores.itam.model.AssetHistory;
+import com.reidosmotores.itam.model.AssetPhoto;
 import com.reidosmotores.itam.model.Maintenance;
+import com.reidosmotores.itam.model.TermoUso;
 import com.reidosmotores.itam.repository.AssetHistoryRepository;
+import com.reidosmotores.itam.repository.AssetPhotoRepository;
 import com.reidosmotores.itam.repository.AssetRepository;
 import com.reidosmotores.itam.repository.EmployeeRepository;
 import com.reidosmotores.itam.repository.MaintenanceRepository;
+import com.reidosmotores.itam.repository.TermoUsoRepository;
 import com.reidosmotores.itam.service.QRCodeService;
 
 @Controller
 @RequestMapping("/ativos")
 public class AssetController {
 
-    @Autowired private AssetRepository repository;
-    @Autowired private EmployeeRepository employeeRepository;
-    @Autowired private AssetHistoryRepository historyRepository;
-    @Autowired private MaintenanceRepository maintenanceRepository; // NOVO
-    @Autowired private QRCodeService qrCodeService;
+    @Autowired
+    private AssetRepository repository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
+    @Autowired
+    private AssetHistoryRepository historyRepository;
+    @Autowired
+    private MaintenanceRepository maintenanceRepository;
+    @Autowired
+    private AssetPhotoRepository photoRepository;
+    @Autowired
+    private TermoUsoRepository termoUsoRepository;
+    @Autowired
+    private QRCodeService qrCodeService;
 
     // --- MÉTODOS AUXILIARES ---
     private void carregarDashboard(Model model) {
@@ -70,13 +85,14 @@ public class AssetController {
                     AssetHistory historico = new AssetHistory();
                     historico.setAsset(asset);
                     historico.setDataEvento(LocalDateTime.now());
-                    String nomeAntigo = (assetAntigo.getResponsavel() != null) ? assetAntigo.getResponsavel().getNome() : "Estoque";
+                    String nomeAntigo = (assetAntigo.getResponsavel() != null) ? assetAntigo.getResponsavel().getNome()
+                            : "Estoque";
                     String nomeNovo = (asset.getResponsavel() != null) ? asset.getResponsavel().getNome() : "Estoque";
                     historico.setDescricao("Transferência: Saiu de " + nomeAntigo + " para " + nomeNovo);
                     historyRepository.save(historico);
                 }
             }
-        } 
+        }
         repository.save(asset);
         return "redirect:/ativos";
     }
@@ -110,17 +126,64 @@ public class AssetController {
         }
     }
 
-    // --- ATUALIZADO: Agora carrega o histórico de Manutenção também ---
+    // --- DETALHES: Carrega histórico, manutenções e fotos ---
     @GetMapping("/detalhes/{id}")
     public String verDetalhes(@PathVariable Long id, Model model) {
         Asset asset = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("ID inválido"));
         List<AssetHistory> historico = historyRepository.findByAssetIdOrderByDataEventoDesc(id);
-        List<Maintenance> manutencoes = maintenanceRepository.findByAssetIdOrderByDataManutencaoDesc(id); // NOVO
-        
+        List<Maintenance> manutencoes = maintenanceRepository.findByAssetIdOrderByDataManutencaoDesc(id);
+        List<AssetPhoto> fotos = photoRepository.findByAssetId(id);
+        List<TermoUso> termos = termoUsoRepository.findByAssetIdOrderByDataUploadDesc(id);
+
         model.addAttribute("ativo", asset);
         model.addAttribute("historico", historico);
-        model.addAttribute("manutencoes", manutencoes); // NOVO
-        
+        model.addAttribute("manutencoes", manutencoes);
+        model.addAttribute("listaFotos", fotos);
+        model.addAttribute("listaTermos", termos);
+
         return "detalhes";
+    }
+
+    // --- FOTOS: Upload ---
+    @PostMapping("/{id}/fotos/upload")
+    public String uploadFoto(@PathVariable Long id, @RequestParam("arquivo") MultipartFile arquivo) {
+        try {
+            Asset asset = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("ID inválido"));
+
+            AssetPhoto foto = new AssetPhoto();
+            foto.setAsset(asset);
+            foto.setNomeArquivo(arquivo.getOriginalFilename());
+            foto.setContentType(arquivo.getContentType());
+            foto.setDados(arquivo.getBytes());
+            foto.setDataUpload(LocalDateTime.now());
+
+            photoRepository.save(foto);
+        } catch (Exception e) {
+            // Log error silently, redirect back
+        }
+        return "redirect:/ativos/detalhes/" + id;
+    }
+
+    // --- FOTOS: Servir imagem ---
+    @GetMapping("/fotos/{fotoId}")
+    public ResponseEntity<byte[]> servirFoto(@PathVariable Long fotoId) {
+        AssetPhoto foto = photoRepository.findById(fotoId).orElse(null);
+        if (foto == null || foto.getDados() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(foto.getContentType()))
+                .body(foto.getDados());
+    }
+
+    // --- FOTOS: Deletar ---
+    @GetMapping("/fotos/{fotoId}/deletar")
+    public String deletarFoto(@PathVariable Long fotoId) {
+        AssetPhoto foto = photoRepository.findById(fotoId).orElse(null);
+        Long assetId = (foto != null) ? foto.getAsset().getId() : null;
+        if (foto != null) {
+            photoRepository.delete(foto);
+        }
+        return "redirect:/ativos/detalhes/" + assetId;
     }
 }
