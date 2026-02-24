@@ -1,8 +1,8 @@
-# ITAM - Sistema de Gestão de Ativos de TI (Rei dos Motores)
+# ITAM - Sistema de Gestão de Ativos de TI 
 
 ## Sobre o Projeto
 
-O ITAM (IT Asset Management) é uma solução corporativa desenvolvida para modernizar e centralizar o controle de infraestrutura de TI da empresa Rei dos Motores. O sistema substitui controles manuais e descentralizados por uma aplicação web robusta, focada na integridade dos dados, rastreabilidade patrimonial e suporte à tomada de decisão gerencial.
+O ITAM (IT Asset Management) é uma solução corporativa desenvolvida para modernizar e centralizar o controle de infraestrutura de TI. O sistema substitui controles manuais e descentralizados por uma aplicação web robusta, focada na integridade dos dados, rastreabilidade patrimonial e suporte à tomada de decisão gerencial.
 
 A aplicação gerencia o ciclo de vida completo dos ativos, desde a aquisição, passando por manutenções e transferências de responsabilidade, até o descarte final, integrando dados financeiros e operacionais.
 
